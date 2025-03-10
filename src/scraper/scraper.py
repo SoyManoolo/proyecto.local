@@ -4,7 +4,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.ui import WebDriverWait
 from DatabaseController import DatabaseController
 import os
-import requests 
+import requests
+import os
+import requests
 
 personajes = [
     {
@@ -204,20 +206,55 @@ def scraperStats():
     # db_controller.close_connection()
     print(stats_data)
 
+# Ruta de imágenes
 IMAGE_FOLDER = "public/assets/img/"
 os.makedirs(IMAGE_FOLDER, exist_ok=True)  # Asegura que la carpeta exista
 
+db_controller = DatabaseController()  # Conexión con la base de datos
+
+def scraperStats():
+    driver = webdriver.Chrome()
+    driver.get("https://blue-lock-marcelones.vercel.app/")
+
+    wait = WebDriverWait(driver, 3)
+    buttons = driver.find_elements(By.CSS_SELECTOR, "button.select-none")
+
+    stats_data = []
+
+    for player_id, button in enumerate(buttons, start=1):
+        button.click()
+
+        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".flex.w-\\[70px\\].justify-center.items-center.bg-color1.mx-1.font-roboto.text-white.font-bold")))
+
+        stats = driver.find_elements(By.CSS_SELECTOR, ".flex.w-\\[70px\\].justify-center.items-center.bg-color1.mx-1.font-roboto.text-white.font-bold")
+        stat_values = [int(stat.text) for stat in stats]
+
+        stats_data.append({
+            "player_id": player_id,
+            "def": stat_values[0],
+            "spd": stat_values[1],
+            "off": stat_values[2],
+            "pass": stat_values[3],
+            "drb": stat_values[4],
+            "shoot": stat_values[5]
+        })
+
+    driver.quit()
+
+    # Insertar estadísticas en MySQL
+    db_controller.insert_stats(stats_data)
+    print("Estadísticas insertadas en MySQL")
+
 def scraperPlayers():
     driver = webdriver.Chrome()
-    wait = WebDriverWait(driver, 5)  # Espera global para los elementos
+    wait = WebDriverWait(driver, 5)
 
-    players_data = []  # Lista para almacenar los resultados
+    players_data = []
 
     for player_id, personaje in enumerate(personajes, start=1):
         driver.get(personaje["url"])
 
         try:
-            # Scraping de la fecha de nacimiento
             birthday_element = wait.until(EC.presence_of_element_located(
                 (By.CSS_SELECTOR, 'div[data-source="birthday"] .pi-data-value')
             ))
@@ -227,31 +264,25 @@ def scraperPlayers():
             birthday = "N/A"
 
         try:
-            # Scraping de la altura
             height_element = wait.until(EC.presence_of_element_located(
                 (By.CSS_SELECTOR, 'div[data-source="height"] .pi-data-value')
             ))
             driver.execute_script("arguments[0].querySelectorAll('sup').forEach(e => e.remove());", height_element)
             height_raw = height_element.text.strip()
-
-            # ✅ Método para dividir y tomar solo la parte de centímetros
             height_parts = height_raw.split(" ")
             height = f"{height_parts[0]} {height_parts[1]}" if len(height_parts) >= 2 else "N/A"
         except:
             height = "N/A"
 
         try:
-            # Scraping de la imagen
             image_element = wait.until(EC.presence_of_element_located(
                 (By.CSS_SELECTOR, 'figure.pi-item.pi-image img')
             ))
-            image_url = image_element.get_attribute("src")  # Extraer URL de la imagen
+            image_url = image_element.get_attribute("src")
 
-            # Nombre del archivo de imagen
             image_filename = f"{player_id}.jpg"
             image_path = os.path.join(IMAGE_FOLDER, image_filename)
 
-            # Descargar la imagen si no existe
             if not os.path.exists(image_path):
                 response = requests.get(image_url, stream=True)
                 if response.status_code == 200:
@@ -261,20 +292,24 @@ def scraperPlayers():
         except:
             image_path = "N/A"
 
-        # Guardar en la lista
         players_data.append({
             "player_id": player_id,
             "nombre": personaje["nombre"],
             "apellido": personaje.get("apellido", "N/A"),
             "fecha_nacimiento": birthday,
             "altura": height,
-            "imagen_local": image_path  # Ruta local de la imagen guardada
+            "imagen_local": image_path
         })
 
-        print(players_data)
-
     driver.quit()
-    return players_data  # Devuelve la lista para su uso posterior
 
-# Ejecutar el scraper e insertar datos en la base de datos
+    # Insertar jugadores en MySQL
+    db_controller.insert_players(players_data)
+    print("Jugadores insertados en MySQL")
+
+# Ejecutar scrapers e insertar datos en la base de datos
 scraperPlayers()
+scraperStats()
+
+# Cerrar conexión a la base de datos
+db_controller.close_connection()

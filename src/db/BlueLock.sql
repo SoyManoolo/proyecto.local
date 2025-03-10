@@ -3,8 +3,8 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: localhost
--- Tiempo de generación: 27-01-2025 a las 15:23:58
--- Versión del servidor: 8.0.40-0ubuntu0.24.04.1
+-- Tiempo de generación: 10-03-2025 a las 15:52:05
+-- Versión del servidor: 8.0.41-0ubuntu0.24.04.1
 -- Versión de PHP: 8.3.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
@@ -33,7 +33,8 @@ CREATE TABLE `Player` (
   `surname` varchar(100) NOT NULL,
   `birthday` date NOT NULL,
   `height` decimal(5,2) NOT NULL,
-  `team_id` int DEFAULT NULL
+  `team_id` int DEFAULT NULL,
+  `img` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -64,6 +65,30 @@ CREATE TABLE `Team` (
   `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `Users`
+--
+
+CREATE TABLE `Users` (
+  `id` int NOT NULL,
+  `username` varchar(20) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `name` varchar(100) NOT NULL,
+  `surname` varchar(100) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `Users`
+--
+
+INSERT INTO `Users` (`id`, `username`, `email`, `name`, `surname`, `password`, `created_at`, `updated_at`) VALUES
+(6, 'soymanolo', 'erik.saldi.diaz@gmail.com', 'Erik Manuel', 'Saldaña Diaz', '$2y$10$gF8sseaAfUBrWDQZlLdaf.7LolTaBjkf5eXJSt69Hx970iLV4sB36', '2025-03-10 15:40:07', '2025-03-10 15:40:07');
+
 --
 -- Índices para tablas volcadas
 --
@@ -89,6 +114,14 @@ ALTER TABLE `Team`
   ADD PRIMARY KEY (`team_id`);
 
 --
+-- Indices de la tabla `Users`
+--
+ALTER TABLE `Users`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `username` (`username`),
+  ADD UNIQUE KEY `email` (`email`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 
@@ -102,13 +135,19 @@ ALTER TABLE `Player`
 -- AUTO_INCREMENT de la tabla `Stats`
 --
 ALTER TABLE `Stats`
-  MODIFY `stats_id` int NOT NULL AUTO_INCREMENT;
+  MODIFY `stats_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT de la tabla `Team`
 --
 ALTER TABLE `Team`
   MODIFY `team_id` int NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT de la tabla `Users`
+--
+ALTER TABLE `Users`
+  MODIFY `id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- Restricciones para tablas volcadas

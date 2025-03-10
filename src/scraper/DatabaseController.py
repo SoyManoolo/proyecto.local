@@ -22,6 +22,19 @@ class DatabaseController:
         self.cursor.executemany(query, values)
         self.db.commit()  # Guarda los cambios en la base de datos
 
+    def insert_players(self, players_data):
+        """ Inserta jugadores en la tabla Player """
+        query = """
+        INSERT INTO Player (player_id, name, surname, birthday, height)
+        VALUES (%s, %s, %s, %s, %s)
+        ON DUPLICATE KEY UPDATE name=name
+        """
+        values = [(entry["player_id"], entry["nombre"], entry["apellido"], entry["fecha_nacimiento"],
+                   entry["altura"]) for entry in players_data]
+
+        self.cursor.executemany(query, values)
+        self.db.commit()
+
     def close_connection(self):
         """ Cierra la conexión con MySQL """
         self.cursor.close()
