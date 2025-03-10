@@ -1,0 +1,25 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <div class="container">
+        <h1>Sign Up</h1><br>
+
+        <form method="POST">
+            <label for="name">{{ translations.name }}</label><br>
+            <input type="text" name="name" id="name" placeholder="name"><br>
+            <label for="surname">{{ translations.surname }}</label><br>
+            <input type="text" name="surname" id="surname" placeholder="surname"><br>
+            <label for="user">{{ translations.username }}</label><br>
+            <input type="text" name="user" id="user" placeholder="username"><br>
+            <label for="email">{{ translations.email }}</label><br>
+            <input type="email" name="email" id="email" placeholder="email"><br>
+            <label for="password">{{ translations.password }}</label><br>
+            <input type="password" name="password" id="password" placeholder="················"><br><br>
+            <button class="btn signUp">{{ translations.signup }}</button>
+        </form>
+        <button class="btn"><a class="a" href="/login">{{ translations.orlogin }}</a></button>
+    </div>
+
+{% endblock %}
+
+

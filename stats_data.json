@@ -1,0 +1,281 @@
+[
+    {
+        "player_id": 1,
+        "def": 77,
+        "spd": 75,
+        "off": 78,
+        "pass": 70,
+        "drb": 82,
+        "shoot": 94
+    },
+    {
+        "player_id": 2,
+        "def": 84,
+        "spd": 68,
+        "off": 88,
+        "pass": 95,
+        "drb": 82,
+        "shoot": 86
+    },
+    {
+        "player_id": 3,
+        "def": 85,
+        "spd": 75,
+        "off": 65,
+        "pass": 71,
+        "drb": 95,
+        "shoot": 94
+    },
+    {
+        "player_id": 4,
+        "def": 98,
+        "spd": 68,
+        "off": 80,
+        "pass": 93,
+        "drb": 88,
+        "shoot": 95
+    },
+    {
+        "player_id": 5,
+        "def": 87,
+        "spd": 93,
+        "off": 88,
+        "pass": 79,
+        "drb": 80,
+        "shoot": 84
+    },
+    {
+        "player_id": 6,
+        "def": 77,
+        "spd": 90,
+        "off": 81,
+        "pass": 79,
+        "drb": 82,
+        "shoot": 82
+    },
+    {
+        "player_id": 7,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 8,
+        "def": 80,
+        "spd": 68,
+        "off": 61,
+        "pass": 88,
+        "drb": 96,
+        "shoot": 95
+    },
+    {
+        "player_id": 9,
+        "def": 78,
+        "spd": 84,
+        "off": 88,
+        "pass": 76,
+        "drb": 67,
+        "shoot": 82
+    },
+    {
+        "player_id": 10,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 11,
+        "def": 82,
+        "spd": 75,
+        "off": 85,
+        "pass": 86,
+        "drb": 92,
+        "shoot": 91
+    },
+    {
+        "player_id": 12,
+        "def": 81,
+        "spd": 86,
+        "off": 89,
+        "pass": 83,
+        "drb": 82,
+        "shoot": 86
+    },
+    {
+        "player_id": 13,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 14,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 15,
+        "def": 74,
+        "spd": 90,
+        "off": 68,
+        "pass": 69,
+        "drb": 79,
+        "shoot": 76
+    },
+    {
+        "player_id": 16,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 17,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 18,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 19,
+        "def": 89,
+        "spd": 76,
+        "off": 77,
+        "pass": 91,
+        "drb": 86,
+        "shoot": 88
+    },
+    {
+        "player_id": 20,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 21,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 22,
+        "def": 95,
+        "spd": 68,
+        "off": 83,
+        "pass": 84,
+        "drb": 72,
+        "shoot": 86
+    },
+    {
+        "player_id": 23,
+        "def": 82,
+        "spd": 76,
+        "off": 80,
+        "pass": 83,
+        "drb": 88,
+        "shoot": 81
+    },
+    {
+        "player_id": 24,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 25,
+        "def": 81,
+        "spd": 93,
+        "off": 83,
+        "pass": 76,
+        "drb": 77,
+        "shoot": 72
+    },
+    {
+        "player_id": 26,
+        "def": 82,
+        "spd": 73,
+        "off": 76,
+        "pass": 77,
+        "drb": 83,
+        "shoot": 84
+    },
+    {
+        "player_id": 27,
+        "def": 0,
+        "spd": 0,
+        "off": 0,
+        "pass": 0,
+        "drb": 0,
+        "shoot": 0
+    },
+    {
+        "player_id": 28,
+        "def": 91,
+        "spd": 74,
+        "off": 81,
+        "pass": 86,
+        "drb": 98,
+        "shoot": 96
+    },
+    {
+        "player_id": 29,
+        "def": 76,
+        "spd": 71,
+        "off": 97,
+        "pass": 90,
+        "drb": 78,
+        "shoot": 94
+    },
+    {
+        "player_id": 30,
+        "def": 83,
+        "spd": 99,
+        "off": 87,
+        "pass": 93,
+        "drb": 82,
+        "shoot": 84
+    },
+    {
+        "player_id": 31,
+        "def": 84,
+        "spd": 77,
+        "off": 97,
+        "pass": 89,
+        "drb": 88,
+        "shoot": 92
+    }
+]

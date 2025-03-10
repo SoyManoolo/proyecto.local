@@ -1,0 +1,19 @@
+main {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+input {
+    border-radius: 8px;
+}
+
+button.logIn {
+    box-shadow: 2px 2px 4px rgb(99, 91, 91) !important;
+}
+
+button.logIn:hover {
+    background-color: rgb(165, 163, 163);
+}
