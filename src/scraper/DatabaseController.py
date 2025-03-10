@@ -4,8 +4,8 @@ class DatabaseController:
     def __init__(self):
         self.db = mysql.connector.connect(
             host="localhost",
-            user="usuario",  # Cambia por tu usuario de MySQL
-            password="password",  # Cambia por tu contraseña
+            user="usuario",
+            password="password",
             database="BlueLock"
         )
         self.cursor = self.db.cursor()
@@ -16,9 +16,9 @@ class DatabaseController:
         INSERT INTO Stats (player_id, def, spd, off, pass, drb, shoot)
         VALUES (%s, %s, %s, %s, %s, %s, %s)
         """
-        values = [(entry["player_id"], entry["def"], entry["spd"], entry["off"], 
+        values = [(entry["player_id"], entry["def"], entry["spd"], entry["off"],
                    entry["pass"], entry["drb"], entry["shoot"]) for entry in stats_data]
-        
+
         self.cursor.executemany(query, values)
         self.db.commit()  # Guarda los cambios en la base de datos
 

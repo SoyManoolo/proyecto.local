@@ -10,10 +10,10 @@ input {
     border-radius: 8px;
 }
 
-button.logIn {
+button {
     box-shadow: 2px 2px 4px rgb(99, 91, 91) !important;
 }
 
-button.logIn:hover {
+button:hover {
     background-color: rgb(165, 163, 163);
 }

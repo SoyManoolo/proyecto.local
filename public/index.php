@@ -54,11 +54,11 @@ switch ($chunks[0]) {
 
     case 'signup':
         if($_SERVER['REQUEST_METHOD'] === 'POST') {
-            $name = $_POST[''] ?? '';
-            $surname = $_POST[''] ?? '';
-            $username = $_POST[''] ?? '';
-            $email = $_POST[''] ?? '';
-            $password = $_POST[''] ?? '';
+            $name = $_POST['name'] ?? '';
+            $surname = $_POST['surname'] ?? '';
+            $username = $_POST['user'] ?? '';
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
 
             $signupResult = UserController::signUp($username, $email, $name, $surname, $password);
 
@@ -69,7 +69,7 @@ switch ($chunks[0]) {
                 // Si hay error, mostrarlo en la vista de login
                 echo $twig->render('login.twig', [
                 'translations' => $translations,
-                'error' => $loginResult // Muestra mensaje de error en la vista
+                'error' => $signupResult // Muestra mensaje de error en la vista
                 ]);
             }
         } else {

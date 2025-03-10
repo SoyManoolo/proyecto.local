@@ -1,6 +1,7 @@
 <?php
 
-function detectUserLocale() {
+function detectUserLocale()
+{
     // Detectar el idioma del navegador (ejemplo: "es-ES,es;q=0.9,en;q=0.8")
     $lang = substr($_SERVER['HTTP_ACCEPT_LANGUAGE'], 0, 2); // Extraer los 2 primeros caracteres
 

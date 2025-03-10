@@ -1,6 +1,6 @@
 <?php
 return [
-    // login y signcup
+    // login y signup
     "login" => "Iniciar Sesión",
     "username" => "Usuario",
     "usernameemail" => "Usuario/Email",

@@ -1,15 +1,18 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-    <div class="container">
-        <h1>{{ translations.login }}</h1><br>
-        <form method="POST">
-            <label for="user">{{ translations.usernameemail }}</label><br>
-            <input type="text" name="user" id="user" placeholder="username"><br>
-            <label for="password">{{ translations.password }}</label><br>
-            <input type="password" name="password" id="password" placeholder="················"><br><br>
-            <button class="btn logIn">{{ translations.login }}</button>
-        </form>
-        <button class="btn"><a class="a" href="/signup">{{ translations.orsignup }}</a></button>
-    </div>
+	<div class="container">
+		<h1>{{ translations.login }}</h1><br>
+		<form method="POST">
+			<label for="user">{{ translations.usernameemail }}</label><br>
+			<input type="text" name="user" id="user" placeholder="username"><br>
+			<label for="password">{{ translations.password }}</label><br>
+			<input type="password" name="password" id="password" placeholder="················"><br><br>
+			<button class="btn">{{ translations.login }}</button>
+		</form>
+		<a class="a" href="/signup">
+			<button class="btn">{{ translations.orsignup }}</button>
+		</a>
+
+	</div>
 {% endblock %}
