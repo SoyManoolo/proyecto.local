@@ -1,18 +1,25 @@
-{% extends "layout.twig" %}
+{% extends "layout2.twig" %}
 
 {% block content %}
-	<div class="container">
-		<h1>{{ translations.login }}</h1><br>
-		<form method="POST">
-			<label for="user">{{ translations.usernameemail }}</label><br>
-			<input type="text" name="user" id="user" placeholder="username"><br>
-			<label for="password">{{ translations.password }}</label><br>
-			<input type="password" name="password" id="password" placeholder="················"><br><br>
-			<button class="btn">{{ translations.login }}</button>
-		</form>
-		<a class="a" href="/signup">
-			<button class="btn">{{ translations.orsignup }}</button>
-		</a>
-
-	</div>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <h1 class="text-center mb-4" style="color: #0000F5;">Login</h1>
+                <form method="POST" class="p-4" style="border-color: #3535A0; border-radius: 10px; background: #0000F5;">
+                    <div class="mb-3">
+                        <label for="user" class="form-label text-white"><strong>Username or Email</strong></label>
+                        <input type="text" name="user" id="user" class="form-control" placeholder="username" style=" border-color: #3535A0;" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-white"><strong>Password</strong></label>
+                        <input type="password" name="password" id="password" class="form-control" placeholder="················" style="border-color: #3535A0;" required>
+                    </div>
+                    <button type="submit" class="btn w-100 mb-3" style="background-color: #0000F5; color: white; border-color: #3535A0;"><strong>Login</strong></button>
+                    <a href="/signup" class="text-decoration-none">
+                        <button type="button" class="btn w-100 " style="color: white; background-color:rgb(43, 43, 240); border-color: #3535A0;"><strong>Or Sign Up</strong></button>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}

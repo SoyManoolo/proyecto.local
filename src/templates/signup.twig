@@ -1,26 +1,37 @@
-{% extends "layout.twig" %}
+{% extends "layout2.twig" %}
 
 {% block content %}
-	<div class="container">
-		<h1>Sign Up</h1><br>
-
-		<form method="POST">
-			<label for="name">{{ translations.name }}</label><br>
-			<input type="text" name="name" id="name" placeholder="name"><br>
-			<label for="surname">{{ translations.surname }}</label><br>
-			<input type="text" name="surname" id="surname" placeholder="surname"><br>
-			<label for="user">{{ translations.username }}</label><br>
-			<input type="text" name="user" id="user" placeholder="username"><br>
-			<label for="email">{{ translations.email }}</label><br>
-			<input type="email" name="email" id="email" placeholder="email"><br>
-			<label for="password">{{ translations.password }}</label><br>
-			<input type="password" name="password" id="password" placeholder="················"><br><br>
-			<button class="btn">{{ translations.signup }}</button>
-		</form>
-		<a class="a" href="/login">
-			<button class="btn">{{ translations.orlogin }}</button>
-		</a>
-	</div>
-
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-4">
+                <h1 class="text-center mb-4 text-white">Sign Up</h1>
+                <form method="POST" class="p-4 bg-dark" style="border-color: #3535A0; border-radius: 10px;">
+                    <div class="mb-3">
+                        <label for="name" class="form-label text-white">{{ translations.name }}</label>
+                        <input type="text" name="name" id="name" class="form-control bg-dark text-white" placeholder="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="surname" class="form-label text-white">{{ translations.surname }}</label>
+                        <input type="text" name="surname" id="surname" class="form-control bg-dark text-white" placeholder="surname" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="user" class="form-label text-white">{{ translations.username }}</label>
+                        <input type="text" name="user" id="user" class="form-control bg-dark text-white" placeholder="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label text-white">{{ translations.email }}</label>
+                        <input type="email" name="email" id="email" class="form-control bg-dark text-white" placeholder="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label text-white">{{ translations.password }}</label>
+                        <input type="password" name="password" id="password" class="form-control bg-dark text-white" placeholder="················" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100 mb-3">{{ translations.signup }}</button>
+                    <a href="/login" class="text-decoration-none">
+                        <button type="button" class="btn btn-outline-light w-100">{{ translations.orlogin }}</button>
+                    </a>
+                </form>
+            </div>
+        </div>
+    </div>
 {% endblock %}
-

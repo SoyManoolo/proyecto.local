@@ -1,5 +1,152 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-	<h1>Hola</h1>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1a1a2e;">
+            <div class="container">
+                <a class="navbar-brand" href="/home">
+                    <img src="assets/img/BlueLock_logo.svg" alt="Blue Lock Logo" class="img-fluid" style="max-width: 180px;">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                               <i class="bi bi-person-circle fs-4"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" 
+                                style="background-color: #1a1a2e; border-color: #3535A0;">
+                                <li><a class="dropdown-item text-white" href="/profile">Profile</a></li>
+                                <li><hr class="dropdown-divider" style="border-color: #3535A0;"></li>
+                                <li><a class="dropdown-item text-white" href="/login">Logout <i class="bi bi-box-arrow-right"></i></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container py-5">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="text-white fw-bold"><span style="border-bottom: 4px solid #3535A0; padding-bottom: 5px;">Blue Lock Players</span></h1>
+            <div class="input-group" style="max-width: 300px;">
+                <input type="text" class="form-control" placeholder="Search player..." 
+                       style="background-color: #121225; color: white; border-color: #3535A0;">
+                <button class="btn btn-outline-light" type="button" style="border-color: #3535A0;">
+                    <i class="bi bi-search"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="mb-4">
+            <div class="btn-group">
+                <button type="button" class="btn btn-sm active" style="background-color: #3535A0; color: white;">All</button>
+                <button type="button" class="btn btn-sm btn-outline-light">Strikers</button>
+                <button type="button" class="btn btn-sm btn-outline-light">Midfielders</button>
+                <button type="button" class="btn btn-sm btn-outline-light">Defenders</button>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            {% for player in players %}
+                <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; 
+                                              border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
+                        <div class="position-relative">
+                            <img src="{{ 'assets/img/' ~ player.player_id ~ '.jpg' }}" alt="{{ player.name }} {{ player.surname }}"
+                                class="card-img-top" style="height: 220px; object-fit: cover;">
+                            <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white py-1 px-3">
+                                <span class="fw-bold">{{ player.name }} {{ player.surname }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between mb-3">
+                                <div>
+                                    <small class="text-light"><i class="bi bi-calendar-event"></i> {{ player.birthday }}</small>
+                                </div>
+                                <div>
+                                    <small class="text-light"><i class="bi bi-rulers"></i> {{ player.height }} cm</small>
+                                </div>
+                            </div>
+                            <div class="mt-3">
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-light small">{{ translations.defense }}</span>
+                                    <span class="text-white fw-bold">{{ player.def }}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ player.def * 10 }}%; background-color: #3535A0;" 
+                                        aria-valuenow="{{ player.def }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-light small">{{ translations.speed }}</span>
+                                    <span class="text-white fw-bold">{{ player.spd }}</span>
+                                </div>
+                                <div class="progress mb-2" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ player.spd * 10 }}%; background-color: #3535A0;" 
+                                        aria-valuenow="{{ player.spd }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                </div>
+                                
+                                <div class="d-flex justify-content-between mb-1">
+                                    <span class="text-light small">{{ translations.offense }}</span>
+                                    <span class="text-white fw-bold">{{ player.off }}</span>
+                                </div>
+                                <div class="progress" style="height: 6px;">
+                                    <div class="progress-bar" role="progressbar" style="width: {{ player.off * 10 }}%; background-color: #3535A0;" 
+                                        aria-valuenow="{{ player.off }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-footer border-0" style="background-color: rgba(26, 26, 46, 1);">
+                            <button class="btn btn-sm w-100" style="background-color: #3535A0; color: white;">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(53, 53, 160, 0.3);
+    }
+    
+    .btn-outline-light {
+        transition: all 0.3s;
+    }
+    
+    .btn-outline-light:hover {
+        background-color: #3535A0;
+        border-color: #3535A0;
+    }
+    
+    /* Estilo scrollbar personalizado */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    
+    ::-webkit-scrollbar-track {
+        background: #1a1a2e;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+        background: #3535A0;
+        border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+        background: #4545B0;
+    }
+</style>
 {% endblock %}

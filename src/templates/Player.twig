@@ -1,0 +1,17 @@
+<div class="card h-100 bg-dark" style=" border-color: #3535A0;">
+    <img src="{{ 'assets/img/' ~ player.player_id ~ '.jpg' }}" alt="{{ player.name }} {{ player.surname }}"
+         class="card-img-top mx-auto d-block" style="padding:10px; width: 150px; height: 150px; object-fit: cover; border-radius: 50%;">
+    <div class="card-body">
+        <h5 class="card-title text-center text-white">{{ player.name }} {{ player.surname }}</h5>
+        <p class="card-text text-light"><strong>{{ translations.birthday }}:</strong> {{ player.birthday }}</p>
+        <p class="card-text text-light"><strong>{{ translations.height }}:</strong> {{ player.height }} cm</p>
+        <div class="mt-3">
+            <p class="text-light"><strong>{{ translations.defense }}:</strong> {{ player.def }}</p>
+            <p class="text-light"><strong>{{ translations.speed }}:</strong> {{ player.spd }}</p>
+            <p class="text-light"><strong>{{ translations.offense }}:</strong> {{ player.off }}</p>
+            <p class="text-light"><strong>{{ translations.passing }}:</strong> {{ player.pass }}</p>
+            <p class="text-light"><strong>{{ translations.dribbling }}:</strong> {{ player.drb }}</p>
+            <p class="text-light"><strong>{{ translations.shooting }}:</strong> {{ player.shoot }}</p>
+        </div>
+    </div>
+</div>
