@@ -1,11 +1,27 @@
 {% extends "layout.twig" %}
 
 {% block content %}
-    <div class="container my-5 text-center">
-        <h1 class="text-white">404</h1>
-        <h2 class="text-light">Page Not Found</h2>
-        <p class="text-muted">
-            Sorry, the page you are looking for does not exist.
-        </p>
+    <div class="container my-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header text-center py-4" style="background-color: #0000F5; border-bottom: none;">
+                        <h1 class="text-white mb-0 display-1 fw-bold">404</h1>
+                    </div>
+                    <div class="card-body p-5 text-center" style="background-color: #f8f9fa;">
+                        <h2 style="color: #0000F5; font-weight: 600;">Página no encontrada</h2>
+                        <p class="mt-3 mb-4" style="color: #3535A0;">
+                            Lo sentimos, la página que estás buscando no existe.
+                        </p>
+                        <div class="d-grid">
+                            <a href="/" class="btn btn-lg" 
+                               style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                <i class="bi bi-house-fill me-2"></i>Volver al inicio
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}

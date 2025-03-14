@@ -5,8 +5,8 @@ class DatabaseController
 {
 
   private static $host = "localhost";
-  private static $username = "usuario";
-  private static $password = "password";
+  private static $username = "root";
+  private static $password = "Doblemanuel0426.";
   private static $dbname = "BlueLock";
   //private $dsn = 'mysql:host='.$host.';dbname='.$dbname;
   private static $options = array(

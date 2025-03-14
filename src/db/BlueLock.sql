@@ -33,7 +33,6 @@ CREATE TABLE `Player` (
   `surname` varchar(100) NOT NULL,
   `birthday` date NOT NULL,
   `height` decimal(5,2) NOT NULL,
-  `team_id` int DEFAULT NULL,
   `img` varchar(200) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -52,17 +51,6 @@ CREATE TABLE `Stats` (
   `drb` int NOT NULL,
   `shoot` int NOT NULL,
   `player_id` int DEFAULT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- --------------------------------------------------------
-
---
--- Estructura de tabla para la tabla `Team`
---
-
-CREATE TABLE `Team` (
-  `team_id` int NOT NULL,
-  `name` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -97,8 +85,7 @@ INSERT INTO `Users` (`id`, `username`, `email`, `name`, `surname`, `password`, `
 -- Indices de la tabla `Player`
 --
 ALTER TABLE `Player`
-  ADD PRIMARY KEY (`player_id`),
-  ADD KEY `team_id` (`team_id`);
+  ADD PRIMARY KEY (`player_id`);
 
 --
 -- Indices de la tabla `Stats`
@@ -106,12 +93,6 @@ ALTER TABLE `Player`
 ALTER TABLE `Stats`
   ADD PRIMARY KEY (`stats_id`),
   ADD KEY `player_id` (`player_id`);
-
---
--- Indices de la tabla `Team`
---
-ALTER TABLE `Team`
-  ADD PRIMARY KEY (`team_id`);
 
 --
 -- Indices de la tabla `Users`
@@ -138,12 +119,6 @@ ALTER TABLE `Stats`
   MODIFY `stats_id` int NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
--- AUTO_INCREMENT de la tabla `Team`
---
-ALTER TABLE `Team`
-  MODIFY `team_id` int NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT de la tabla `Users`
 --
 ALTER TABLE `Users`
@@ -152,12 +127,6 @@ ALTER TABLE `Users`
 --
 -- Restricciones para tablas volcadas
 --
-
---
--- Filtros para la tabla `Player`
---
-ALTER TABLE `Player`
-  ADD CONSTRAINT `Player_ibfk_1` FOREIGN KEY (`team_id`) REFERENCES `Team` (`team_id`);
 
 --
 -- Filtros para la tabla `Stats`

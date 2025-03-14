@@ -3,34 +3,68 @@
 {% block content %}
     <div class="container my-5">
         <div class="row justify-content-center">
-            <div class="col-md-6 col-lg-4">
-                <h1 class="text-center mb-4 text-white">Sign Up</h1>
-                <form method="POST" class="p-4 bg-dark" style="border-color: #3535A0; border-radius: 10px;">
-                    <div class="mb-3">
-                        <label for="name" class="form-label text-white">{{ translations.name }}</label>
-                        <input type="text" name="name" id="name" class="form-control bg-dark text-white" placeholder="name" required>
+            <div class="col-md-6 col-lg-5">
+                <div class="card shadow-lg border-0">
+                    <div class="card-header text-center py-4" style="background-color: #0000F5; border-bottom: none;">
+                        <h1 class="text-white mb-0">{{ translations.signup }}</h1>
                     </div>
-                    <div class="mb-3">
-                        <label for="surname" class="form-label text-white">{{ translations.surname }}</label>
-                        <input type="text" name="surname" id="surname" class="form-control bg-dark text-white" placeholder="surname" required>
+                    <div class="card-body p-4" style="background-color: #f8f9fa;">
+                        <form method="POST">
+                            <div class="mb-3">
+                                <label for="name" class="form-label" style="color: #0000F5; font-weight: 600;">
+                                    <i class="bi bi-person-fill me-2"></i>{{ translations.name }}
+                                </label>
+                                <input type="text" name="name" id="name" class="form-control form-control-lg" 
+                                       placeholder="{{ translations.name }}" 
+                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="surname" class="form-label" style="color: #0000F5; font-weight: 600;">
+                                    <i class="bi bi-person-badge-fill me-2"></i>{{ translations.surname }}
+                                </label>
+                                <input type="text" name="surname" id="surname" class="form-control form-control-lg" 
+                                       placeholder="{{ translations.surname }}" 
+                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="user" class="form-label" style="color: #0000F5; font-weight: 600;">
+                                    <i class="bi bi-person-circle me-2"></i>{{ translations.username }}
+                                </label>
+                                <input type="text" name="user" id="user" class="form-control form-control-lg" 
+                                       placeholder="{{ translations.username }}" 
+                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="email" class="form-label" style="color: #0000F5; font-weight: 600;">
+                                    <i class="bi bi-envelope-fill me-2"></i>{{ translations.email }}
+                                </label>
+                                <input type="email" name="email" id="email" class="form-control form-control-lg" 
+                                       placeholder="{{ translations.email }}" 
+                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="password" class="form-label" style="color: #0000F5; font-weight: 600;">
+                                    <i class="bi bi-lock-fill me-2"></i>{{ translations.password }}
+                                </label>
+                                <input type="password" name="password" id="password" class="form-control form-control-lg" 
+                                       placeholder="••••••••" 
+                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                            </div>
+                            <div class="d-grid gap-3 mt-4">
+                                <button type="submit" class="btn btn-lg" 
+                                        style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                    {{ translations.signup }}
+                                </button>
+                                <a href="/login" class="text-decoration-none d-grid">
+                                    <button type="button" class="btn btn-lg" 
+                                            style="background-color: transparent; color: #0000F5; border: 2px solid #0000F5; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                        {{ translations.orlogin }}
+                                    </button>
+                                </a>
+                            </div>
+                        </form>
                     </div>
-                    <div class="mb-3">
-                        <label for="user" class="form-label text-white">{{ translations.username }}</label>
-                        <input type="text" name="user" id="user" class="form-control bg-dark text-white" placeholder="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label text-white">{{ translations.email }}</label>
-                        <input type="email" name="email" id="email" class="form-control bg-dark text-white" placeholder="email" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label text-white">{{ translations.password }}</label>
-                        <input type="password" name="password" id="password" class="form-control bg-dark text-white" placeholder="················" required>
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100 mb-3">{{ translations.signup }}</button>
-                    <a href="/login" class="text-decoration-none">
-                        <button type="button" class="btn btn-outline-light w-100">{{ translations.orlogin }}</button>
-                    </a>
-                </form>
+                </div>
             </div>
         </div>
     </div>
