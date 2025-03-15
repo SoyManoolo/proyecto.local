@@ -17,7 +17,7 @@ return [
     // Información del Jugador
     "players" => "Jugadores",
     "player" => "Jugador",
-    "birthday" => "Fecha de nacimiento",
+    "birthday" => "Cumpleaños",
     "height" => "Altura",
     "team" => "Equipo",
     "image" => "Imagen",

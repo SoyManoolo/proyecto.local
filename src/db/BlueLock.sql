@@ -32,8 +32,7 @@ CREATE TABLE `Player` (
   `name` varchar(100) NOT NULL,
   `surname` varchar(100) NOT NULL,
   `birthday` date NOT NULL,
-  `height` decimal(5,2) NOT NULL,
-  `img` varchar(200) DEFAULT NULL
+  `height` decimal(5,2) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------

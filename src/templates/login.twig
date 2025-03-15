@@ -9,37 +9,37 @@
                         <h1 class="text-white mb-0">Login</h1>
                     </div>
                     <div class="card-body p-4" style="background-color: #f8f9fa;">
-                        <form method="POST">
+                        {% if error is defined %}
+                            <div class="alert alert-danger" role="alert">
+                                {{ error }}
+                            </div>
+                        {% endif %}
+                        <div id="loginAlert" class="alert d-none" role="alert"></div>
+                        <form id="loginForm" method="POST">
                             <div class="mb-4">
                                 <label for="user" class="form-label" style="color: #0000F5; font-weight: 600;">
                                     <i class="bi bi-person-fill me-2"></i>Username o Email
                                 </label>
-                                <input type="text" name="user" id="user" class="form-control form-control-lg" 
-                                       placeholder="Ingresa tu usuario" 
-                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                                <input type="text" name="user" id="user" class="form-control form-control-lg" placeholder="Ingresa tu usuario" style="border-radius: 8px; border: 2px solid #3535A0;" required>
                             </div>
                             <div class="mb-4">
                                 <label for="password" class="form-label" style="color: #0000F5; font-weight: 600;">
                                     <i class="bi bi-lock-fill me-2"></i>Contraseña
                                 </label>
-                                <input type="password" name="password" id="password" class="form-control form-control-lg" 
-                                       placeholder="••••••••" 
-                                       style="border-radius: 8px; border: 2px solid #3535A0;" required>
+                                <input type="password" name="password" id="password" class="form-control form-control-lg" placeholder="••••••••" style="border-radius: 8px; border: 2px solid #3535A0;" required>
                             </div>
                             <div class="d-grid gap-3 mt-4">
-                                <button type="submit" class="btn btn-lg" 
-                                        style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                <button type="submit" id="loginBtn" class="btn btn-lg" style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
                                     Iniciar Sesión
                                 </button>
                                 <a href="/signup" class="text-decoration-none d-grid">
-                                    <button type="button" class="btn btn-lg" 
-                                            style="background-color: transparent; color: #0000F5; border: 2px solid #0000F5; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                    <button type="button" class="btn btn-lg" style="background-color: transparent; color: #0000F5; border: 2px solid #0000F5; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
                                         Registrarse
                                     </button>
                                 </a>
                             </div>
                             <div class="text-center mt-3">
-                                <a href="#" class="text-decoration-none" style="color: #3535A0; font-size: 0.9rem;">
+                                <a href="/forgot-password" class="text-decoration-none" style="color: #3535A0; font-size: 0.9rem;">
                                     ¿Olvidaste tu contraseña?
                                 </a>
                             </div>
@@ -49,4 +49,102 @@
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+    console.log("El script de login.js se está ejecutando");
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const loginForm = document.getElementById('loginForm');
+    const loginAlert = document.getElementById('loginAlert');
+    const loginBtn = document.getElementById('loginBtn');
+
+    if (!loginForm || !loginAlert || !loginBtn) {
+        console.error('No se encontraron elementos del formulario');
+        return;
+    }
+
+    loginForm.addEventListener('submit', function (e) {
+        e.preventDefault();
+        
+        console.log("Enviando formulario de login");
+        
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = 'Iniciando sesión...';
+        
+        const formData = new FormData(loginForm);
+        
+        fetch('/api/user/login', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            console.log("Respuesta recibida:", response);
+            return response.json();
+        })
+        .then(data => {
+            console.log("Datos completos:", data);
+            
+            if (data.status === 'success') {
+                if (!data.user || !data.token) {
+                    console.error("Error: Datos incompletos", data);
+                    showAlert('error', 'Datos de usuario incompletos');
+                    loginBtn.disabled = false;
+                    loginBtn.innerHTML = 'Iniciar Sesión';
+                    return;
+                }
+                
+                const userData = {
+                    id: data.user.id,
+                    username: data.user.username,
+                    email: data.user.email,
+                    name: data.user.name,
+                    surname: data.user.surname
+                };
+                
+                console.log("Guardando datos:", userData);
+                
+                try {
+                    // Intentar limpiar el almacenamiento anterior
+                    localStorage.clear();
+                    sessionStorage.clear();
+                    
+                    // Guardar los nuevos datos
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(userData));
+                    
+                    // Verificar que se guardó
+                    const savedUser = localStorage.getItem('user');
+                    console.log("Usuario guardado:", savedUser);
+                    
+                    // Redirigir después de un retraso
+                    setTimeout(() => {
+                        window.location.href = '/home';
+                    }, 500);
+                } catch (storageError) {
+                    console.error("Error al guardar en localStorage:", storageError);
+                    showAlert('error', 'Error al guardar la sesión');
+                }
+            } else {
+                showAlert('error', data.message || 'Error al iniciar sesión');
+                loginBtn.disabled = false;
+                loginBtn.innerHTML = 'Iniciar Sesión';
+            }
+        })
+        .catch(error => {
+            console.error('Error de conexión:', error);
+            showAlert('error', 'Error al conectar con el servidor');
+            loginBtn.disabled = false;
+            loginBtn.innerHTML = 'Iniciar Sesión';
+        });
+    });
+
+    function showAlert(type, message) {
+        loginAlert.classList.remove('d-none', 'alert-success', 'alert-danger');
+        loginAlert.classList.add(type === 'success' ? 'alert-success' : 'alert-danger');
+        loginAlert.textContent = message;
+    }
+});
+    </script>
 {% endblock %}

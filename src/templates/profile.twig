@@ -1,0 +1,496 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1a1a2e; box-shadow: 0 4px 12px rgba(0, 0, 245, 0.15);">
+            <div class="container">
+                <a class="navbar-brand" href="/home">
+                    <img src="assets/img/BlueLock_logo.svg" alt="Blue Lock Logo" class="img-fluid" style="max-width: 180px;">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                               <i class="bi bi-list fs-4"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" 
+                                style="background-color: #1a1a2e; border-color: #3535A0; box-shadow: 0 5px 15px rgba(0, 0, 245, 0.2);">
+                                <li><a class="dropdown-item text-white" href="/home">{{ translations.home }}</a></li>
+                                <li><a class="dropdown-item text-white active" href="/profile">{{ translations.profile }}</a></li>
+                                <li><hr class="dropdown-divider" style="border-color: #3535A0;"></li>
+                                <li><a class="dropdown-item text-white logout-btn" href="#"><i class="bi bi-box-arrow-right me-2"></i>{{ translations.logout }}</a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; border-radius: 12px;">
+                    <div class="card-header" style="background-color: rgba(0, 0, 245, 0.2); border-bottom: 2px solid #3535A0;">
+                        <h2 class="text-white text-center mb-0">{{ translations.profile }}</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <div id="profileAlert" class="alert d-none mb-4" role="alert"></div>
+
+                        <form id="profileForm">
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="username" class="form-label text-white">{{ translations.username }}</label>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px;" readonly>
+                                    <small class="form-text text-muted">{{ translations.username_cannot_change }}</small>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="email" class="form-label text-white">{{ translations.email }}</label>
+                                    <input type="email" class="form-control" id="email" name="email" 
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px;" readonly>
+                                    <small class="form-text text-muted">{{ translations.email_cannot_change }}</small>
+                                </div>
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6 mb-3 mb-md-0">
+                                    <label for="name" class="form-label text-white">{{ translations.name }}</label>
+                                    <input type="text" class="form-control" id="name" name="name" required
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px;">
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="surname" class="form-label text-white">{{ translations.surname }}</label>
+                                    <input type="text" class="form-control" id="surname" name="surname" required
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px;">
+                                </div>
+                            </div>
+                            
+                            <hr style="border-color: #3535A0; opacity: 0.5;" class="my-4">
+                            
+                            <h5 class="text-white mb-3">{{ translations.change_password }}</h5>
+                            <div class="mb-3">
+                                <label for="currentPassword" class="form-label text-white">{{ translations.current_password }}</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="currentPassword" name="currentPassword"
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px 0 0 8px;">
+                                    <button class="btn toggle-password" type="button" data-target="currentPassword"
+                                            style="background-color: #3535A0; color: white; border: none; border-radius: 0 8px 8px 0;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="newPassword" class="form-label text-white">{{ translations.new_password }}</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="newPassword" name="newPassword"
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px 0 0 8px;">
+                                    <button class="btn toggle-password" type="button" data-target="newPassword"
+                                            style="background-color: #3535A0; color: white; border: none; border-radius: 0 8px 8px 0;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="confirmPassword" class="form-label text-white">{{ translations.confirm_password }}</label>
+                                <div class="input-group">
+                                    <input type="password" class="form-control" id="confirmPassword" name="confirmPassword"
+                                           style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px 0 0 8px;">
+                                    <button class="btn toggle-password" type="button" data-target="confirmPassword"
+                                            style="background-color: #3535A0; color: white; border: none; border-radius: 0 8px 8px 0;">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <small class="form-text text-muted">{{ translations.leave_blank_no_change }}</small>
+                            </div>
+                            
+                            <div class="d-grid">
+                                <button type="submit" class="btn btn-lg" id="saveProfileBtn"
+                                        style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600;">
+                                    <i class="bi bi-save me-2"></i>{{ translations.save_changes }}
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal fade" id="logoutModal" tabindex="-1" aria-labelledby="logoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="background-color: rgba(26, 26, 46, 0.95); border: 2px solid #3535A0; border-radius: 12px;">
+                <div class="modal-header border-0" style="background-color: rgba(0, 0, 245, 0.2);">
+                    <h5 class="modal-title text-white" id="logoutModalLabel">{{ translations.logout_confirmation }}</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body text-white">
+                    {{ translations.logout_confirm_message }}
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn" data-bs-dismiss="modal"
+                            style="background-color: #3535A0; color: white; border: none; border-radius: 8px;">
+                        {{ translations.cancel }}
+                    </button>
+                    <button type="button" class="btn" id="confirmLogout"
+                            style="background-color: #0000F5; color: white; border: none; border-radius: 8px;">
+                        <i class="bi bi-box-arrow-right me-2"></i>{{ translations.logout }}
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Obtener referencias a elementos del DOM
+            const profileForm = document.getElementById('profileForm');
+            const profileAlert = document.getElementById('profileAlert');
+            const saveProfileBtn = document.getElementById('saveProfileBtn');
+            const logoutBtn = document.querySelector('.logout-btn');
+            const confirmLogoutBtn = document.getElementById('confirmLogout');
+            const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+            
+            // Comprobar que los elementos existen
+            if (!profileForm || !profileAlert || !saveProfileBtn) {
+                console.error('No se encontraron elementos necesarios del formulario');
+                return;
+            }
+            
+            // Inicializar botones de toggle password
+            togglePasswordBtns.forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    const targetId = this.getAttribute('data-target');
+                    const passwordInput = document.getElementById(targetId);
+                    const icon = this.querySelector('i');
+                    
+                    if (passwordInput.type === 'password') {
+                        passwordInput.type = 'text';
+                        icon.classList.remove('bi-eye');
+                        icon.classList.add('bi-eye-slash');
+                    } else {
+                        passwordInput.type = 'password';
+                        icon.classList.remove('bi-eye-slash');
+                        icon.classList.add('bi-eye');
+                    }
+                });
+            });
+            
+            // Cargar datos del perfil
+            loadUserProfile();
+            
+            // Manejar envío del formulario
+            if (profileForm) {
+                profileForm.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    updateProfile();
+                });
+            }
+            
+            // Manejar clic en botón de logout
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+                    logoutModal.show();
+                });
+            }
+            
+            // Manejar clic en botón de confirmar logout
+            if (confirmLogoutBtn) {
+                confirmLogoutBtn.addEventListener('click', function() {
+                    logout();
+                });
+            }
+            
+            // Función para cargar datos del perfil de usuario
+            function loadUserProfile() {
+                console.log('Cargando perfil de usuario...');
+                
+                // Obtener token del localStorage
+                const token = localStorage.getItem('token');
+                console.log('Token encontrado:', token ? 'Sí' : 'No');
+                
+                if (!token) {
+                    // Mostrar mensaje en lugar de redirigir
+                    showAlert('error', '{{ translations.login_required|default("Please log in to view your profile") }}');
+                    
+                    // Deshabilitar formulario
+                    const formElements = profileForm.elements;
+                    for (let i = 0; i < formElements.length; i++) {
+                        formElements[i].disabled = true;
+                    }
+                    
+                    // Añadir botón de login
+                    const loginButton = document.createElement('a');
+                    loginButton.href = '/login';
+                    loginButton.className = 'btn btn-lg mt-3';
+                    loginButton.style = 'background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600;';
+                    loginButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>{{ translations.login|default("Log In") }}';
+                    
+                    // Reemplazar botón de guardar con botón de login
+                    saveProfileBtn.parentNode.appendChild(loginButton);
+                    saveProfileBtn.style.display = 'none';
+                    
+                    return;
+                }
+                
+                try {
+                    // Obtener datos de usuario del localStorage
+                    const userString = localStorage.getItem('user');
+                    console.log('Datos de usuario encontrados:', userString ? 'Sí' : 'No');
+                    
+                    if (!userString) {
+                        console.error('No se encontraron datos de usuario en localStorage');
+                        window.location.href = '/login';
+                        return;
+                    }
+                    
+                    const userData = JSON.parse(userString);
+                    console.log('Datos de usuario cargados:', userData);
+                    
+                    if (userData) {
+                        // Popular campos con datos del localStorage
+                        document.getElementById('username').value = userData.username || '';
+                        document.getElementById('email').value = userData.email || '';
+                        document.getElementById('name').value = userData.name || '';
+                        document.getElementById('surname').value = userData.surname || '';
+                        
+                        // Si name y surname ya están en localStorage, no hay que cargarlos de nuevo
+                        if (userData.name && userData.surname) {
+                            console.log('Nombre y apellido encontrados en localStorage, no se requiere cargar de API');
+                            return;
+                        }
+                        
+                        // Cargar datos adicionales de la API solo si es necesario
+                        console.log('Solicitando datos adicionales de API...');
+                        fetch('/api/user/profile', {
+                            method: 'GET',
+                            headers: {
+                                'Authorization': 'Bearer ' + token,
+                                'Content-Type': 'application/json'
+                            }
+                        })
+                        .then(function(response) {
+                            if (!response.ok) {
+                                throw new Error('Error en respuesta de red');
+                            }
+                            return response.json();
+                        })
+                        .then(function(data) {
+                            console.log('Respuesta API de perfil:', data);
+                            
+                            if (data.status === 'success' && data.data) {
+                                // Actualizar campos con datos de API
+                                if (!userData.name) document.getElementById('name').value = data.data.name || '';
+                                if (!userData.surname) document.getElementById('surname').value = data.data.surname || '';
+                                
+                                // Actualizar localStorage con datos completos
+                                const updatedUserData = {
+                                    id: userData.id,
+                                    username: userData.username,
+                                    email: userData.email,
+                                    name: data.data.name || userData.name || '',
+                                    surname: data.data.surname || userData.surname || ''
+                                };
+                                
+                                console.log('Guardando datos actualizados en localStorage:', updatedUserData);
+                                localStorage.setItem('user', JSON.stringify(updatedUserData));
+                            } else {
+                                showAlert('error', data.message || 'Error cargando datos de perfil');
+                            }
+                        })
+                        .catch(function(error) {
+                            console.error('Error obteniendo datos de perfil:', error);
+                            showAlert('error', 'Error cargando datos de perfil. Por favor intente más tarde.');
+                        });
+                    } else {
+                        console.error('userData es nulo o indefinido');
+                        window.location.href = '/login';
+                    }
+                } catch (error) {
+                    console.error('Error procesando datos de usuario:', error);
+                    showAlert('error', 'Error procesando datos de usuario: ' + error.message);
+                }
+            }
+            
+            // Función para actualizar perfil de usuario
+            function updateProfile() {
+                const token = localStorage.getItem('token');
+                
+                if (!token) {
+                    window.location.href = '/login';
+                    return;
+                }
+                
+                // Obtener datos del formulario
+                const name = document.getElementById('name').value;
+                const surname = document.getElementById('surname').value;
+                const currentPassword = document.getElementById('currentPassword').value;
+                const newPassword = document.getElementById('newPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+
+                // Validar datos
+                if (!name || !surname) {
+                    showAlert('error', 'Nombre y apellido son obligatorios');
+                    return;
+                }
+
+                // Comprobar campos de contraseña
+                if (newPassword || confirmPassword) {
+                    if (!currentPassword) {
+                        showAlert('error', 'Se requiere contraseña actual para cambiar contraseña');
+                        return;
+                    }
+
+                    if (newPassword !== confirmPassword) {
+                        showAlert('error', 'La nueva contraseña y su confirmación no coinciden');
+                        return;
+                    }
+                }
+
+                // Preparar datos para API
+                const userData = {
+                    name: name,
+                    surname: surname
+                };
+
+                // Añadir datos de contraseña si se proporcionaron
+                if (currentPassword && newPassword) {
+                    userData.currentPassword = currentPassword;
+                    userData.newPassword = newPassword;
+                }
+
+                // Deshabilitar botón guardar y mostrar estado de carga
+                saveProfileBtn.disabled = true;
+                saveProfileBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...';
+
+                // Enviar solicitud de actualización a API
+                fetch('/api/user/update', {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': 'Bearer ' + token,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(userData)
+                })
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Error en respuesta de red');
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    if (data.status === 'success') {
+                        showAlert('success', data.message || 'Perfil actualizado exitosamente');
+
+                        // Limpiar campos de contraseña
+                        document.getElementById('currentPassword').value = '';
+                        document.getElementById('newPassword').value = '';
+                        document.getElementById('confirmPassword').value = '';
+
+                        // Actualizar localStorage si se devolvieron datos de usuario
+                        if (data.user) {
+                            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                            const updatedUser = {
+                                id: storedUser.id,
+                                username: storedUser.username,
+                                email: storedUser.email,
+                                name: document.getElementById('name').value,
+                                surname: document.getElementById('surname').value
+                            };
+                            localStorage.setItem('user', JSON.stringify(updatedUser));
+                        } else {
+                            // Si no se devolvieron datos, actualizar localStorage con valores del formulario
+                            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                            if (storedUser) {
+                                const updatedUser = {
+                                    id: storedUser.id,
+                                    username: storedUser.username,
+                                    email: storedUser.email,
+                                    name: document.getElementById('name').value,
+                                    surname: document.getElementById('surname').value
+                                };
+                                localStorage.setItem('user', JSON.stringify(updatedUser));
+                            }
+                        }
+                    } else {
+                        showAlert('error', data.message || 'Error actualizando perfil');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error actualizando perfil:', error);
+                    showAlert('error', 'Error actualizando perfil. Por favor intente más tarde.');
+                })
+                .finally(function() {
+                    // Re-habilitar botón guardar
+                    saveProfileBtn.disabled = false;
+                    saveProfileBtn.innerHTML = '<i class="bi bi-save me-2"></i>' + ('{{ translations.save_changes }}' || 'Guardar Cambios');
+                });
+            }
+
+            // Función para cerrar sesión
+            function logout() {
+                console.log('Cerrando sesión...');
+                // Limpiar localStorage
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                sessionStorage.clear();
+                
+                // Redireccionar a página de login
+                window.location.href = '/login';
+            }
+
+            // Función para mostrar alerta
+            function showAlert(type, message) {
+                profileAlert.classList.remove('d-none', 'alert-success', 'alert-danger');
+                profileAlert.classList.add(type === 'success' ? 'alert-success' : 'alert-danger');
+                profileAlert.textContent = message;
+
+                // Desplazarse a alerta
+                profileAlert.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Auto ocultar alerta después de 5 segundos
+                setTimeout(function() {
+                    profileAlert.classList.add('d-none');
+                }, 5000);
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block styles %}
+    <style>
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(0, 0, 245, 0.25);
+            border-color: #3535A0;
+        }
+
+        .btn:hover {
+            opacity: 0.9;
+        }
+
+        .toggle-password:focus {
+            box-shadow: none;
+        }
+
+        /* Alert animations */
+        .alert {
+            transition: all 0.3s ease-in-out;
+        }
+
+        .alert.d-none {
+            opacity: 0;
+        }
+    </style>
+{% endblock %}

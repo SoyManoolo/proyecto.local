@@ -38,21 +38,30 @@
             </a>
         </div>
 
-        <div class="row">
+        <div id="loadingSpinner" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p class="text-white mt-3">Loading player data...</p>
+        </div>
+
+        <div id="errorMessage" class="alert alert-danger" style="display: none; background-color: rgba(26, 26, 46, 0.8); color: white; border: 2px solid #ff3535;">
+            Error loading player data. Please try again later.
+        </div>
+
+        <div id="playerContent" class="row" style="display: none;">
             <div class="col-lg-4 mb-4">
                 <div class="card shadow-lg" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; border-radius: 12px; overflow: hidden;">
                     <div class="position-relative text-center pt-5 pb-4" style="background-color: rgba(0, 0, 245, 0.1);">
-                        <img src="{{ '/assets/img/' ~ player.player_id ~ '.jpg' }}" alt="{{ player.name }} {{ player.surname }}"
+                        <img id="playerImage" src="" alt=""
                              class="img-fluid rounded-circle mb-3" style="width: 200px; height: 200px; object-fit: cover; border: 3px solid #3535A0; box-shadow: 0 5px 15px rgba(53, 53, 160, 0.3);">
-                        <h2 class="text-white fw-bold mt-3">{{ player.name }} {{ player.surname }}</h2>
+                        <h2 id="playerName" class="text-white fw-bold mt-3"></h2>
                     </div>
                     <div class="card-body p-4">
                         <div class="mb-4">
-                            <p class="text-light mb-3"><i class="bi bi-calendar-event me-2"></i><strong>{{ translations.birthday }}:</strong> {{ player.birthday }}</p>
-                            <p class="text-light mb-3"><i class="bi bi-rulers me-2"></i><strong>{{ translations.height }}:</strong> {{ player.height }} cm</p>
-                            {% if player.team %}
-                            <p class="text-light mb-3"><i class="bi bi-people-fill me-2"></i><strong>{{ translations.team }}:</strong> {{ player.team }}</p>
-                            {% endif %}
+                            <p class="text-light mb-3"><i class="bi bi-calendar-event me-2"></i><strong>{{ translations.birthday }}:</strong> <span id="playerBirthday"></span></p>
+                            <p class="text-light mb-3"><i class="bi bi-rulers me-2"></i><strong>{{ translations.height }}:</strong> <span id="playerHeight"></span></p>
+                            <p id="playerTeamContainer" class="text-light mb-3" style="display: none;"><i class="bi bi-people-fill me-2"></i><strong>{{ translations.team }}:</strong> <span id="playerTeam"></span></p>
                         </div>
                     </div>
                 </div>
@@ -84,66 +93,66 @@
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h5 class="text-light m-0">{{ translations.defense }}</h5>
-                                        <span class="text-white fw-bold fs-4">{{ player.def }}</span>
+                                        <span id="playerDef" class="text-white fw-bold fs-4"></span>
                                     </div>
                                     <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ player.def * 10 }}%; background-color: #3535A0;" 
-                                            aria-valuenow="{{ player.def }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                        <div id="progressDef" class="progress-bar" role="progressbar" style="width: 0%; background-color: #3535A0;" 
+                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h5 class="text-light m-0">{{ translations.speed }}</h5>
-                                        <span class="text-white fw-bold fs-4">{{ player.spd }}</span>
+                                        <span id="playerSpd" class="text-white fw-bold fs-4"></span>
                                     </div>
                                     <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ player.spd * 10 }}%; background-color: #3535A0;" 
-                                            aria-valuenow="{{ player.spd }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                        <div id="progressSpd" class="progress-bar" role="progressbar" style="width: 0%; background-color: #3535A0;" 
+                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h5 class="text-light m-0">{{ translations.offense }}</h5>
-                                        <span class="text-white fw-bold fs-4">{{ player.off }}</span>
+                                        <span id="playerOff" class="text-white fw-bold fs-4"></span>
                                     </div>
                                     <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ player.off * 10 }}%; background-color: #3535A0;" 
-                                            aria-valuenow="{{ player.off }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                        <div id="progressOff" class="progress-bar" role="progressbar" style="width: 0%; background-color: #3535A0;" 
+                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h5 class="text-light m-0">{{ translations.passing }}</h5>
-                                        <span class="text-white fw-bold fs-4">{{ player.pass }}</span>
+                                        <span id="playerPass" class="text-white fw-bold fs-4"></span>
                                     </div>
                                     <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ player.pass * 10 }}%; background-color: #3535A0;" 
-                                            aria-valuenow="{{ player.pass }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                        <div id="progressPass" class="progress-bar" role="progressbar" style="width: 0%; background-color: #3535A0;" 
+                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h5 class="text-light m-0">{{ translations.dribbling }}</h5>
-                                        <span class="text-white fw-bold fs-4">{{ player.drb }}</span>
+                                        <span id="playerDrb" class="text-white fw-bold fs-4"></span>
                                     </div>
                                     <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ player.drb * 10 }}%; background-color: #3535A0;" 
-                                            aria-valuenow="{{ player.drb }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                        <div id="progressDrb" class="progress-bar" role="progressbar" style="width: 0%; background-color: #3535A0;" 
+                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
                                     </div>
                                 </div>
 
                                 <div class="mb-4">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
                                         <h5 class="text-light m-0">{{ translations.shooting }}</h5>
-                                        <span class="text-white fw-bold fs-4">{{ player.shoot }}</span>
+                                        <span id="playerShoot" class="text-white fw-bold fs-4"></span>
                                     </div>
                                     <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
-                                        <div class="progress-bar" role="progressbar" style="width: {{ player.shoot * 10 }}%; background-color: #3535A0;" 
-                                            aria-valuenow="{{ player.shoot }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                        <div id="progressShoot" class="progress-bar" role="progressbar" style="width: 0%; background-color: #3535A0;" 
+                                            aria-valuenow="0" aria-valuemin="0" aria-valuemax="10"></div>
                                     </div>
                                 </div>
                             </div>
@@ -156,116 +165,186 @@
 {% endblock %}
 
 {% block scripts %}
-    <!-- Incluir Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Configuración del gráfico radar
-            const ctx = document.getElementById('statsRadarChart').getContext('2d');
-
-            // Datos del jugador
-            const playerData = {
-                defense: {{ player.def }},
-                speed: {{ player.spd }},
-                offense: {{ player.off }},
-                passing: {{ player.pass }},
-                dribbling: {{ player.drb }},
-                shooting: {{ player.shoot }}
-            };
-
-            // Crear el gráfico radar
-            const statsChart = new Chart(ctx, {
-                type: 'radar',
-                data: {
-                    labels: [
-                        '{{ translations.defense }}', 
-                        '{{ translations.speed }}', 
-                        '{{ translations.offense }}',
-                        '{{ translations.passing }}',
-                        '{{ translations.dribbling }}',
-                        '{{ translations.shooting }}'
-                    ],
-                    datasets: [{
-                        label: '{{ player.name }} {{ player.surname }}',
-                        data: [
-                            playerData.defense,
-                            playerData.speed,
-                            playerData.offense,
-                            playerData.passing,
-                            playerData.dribbling,
-                            playerData.shooting
-                        ],
-                        backgroundColor: 'rgba(0, 0, 245, 0.2)',
-                        borderColor: '#3535A0',
-                        borderWidth: 2,
-                        pointBackgroundColor: '#0000F5',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: '#0000F5'
-                    }]
-                },
-                options: {
-                    scales: {
-                        r: {
-                            angleLines: {
-                                color: 'rgba(255, 255, 255, 0.2)'
-                            },
-                            grid: {
-                                color: 'rgba(255, 255, 255, 0.2)'
-                            },
-                            pointLabels: {
-                                color: 'white',
-                                font: {
-                                    size: 14,
-                                    weight: 'bold'
-                                }
-                            },
-                            ticks: {
-                                display: false,
-                                stepSize: 2,
-                                max: 10,
-                                min: 0
-                            },
-                            suggestedMin: 0,
-                            suggestedMax: 10
+            const playerId = {{ playerId }};
+            const loadingSpinner = document.getElementById('loadingSpinner');
+            const errorMessage = document.getElementById('errorMessage');
+            const playerContent = document.getElementById('playerContent');
+            let radarChart = null;
+            
+            // Fetch player data from API
+            fetchPlayerData(playerId);
+            
+            function fetchPlayerData(id) {
+                loadingSpinner.style.display = 'block';
+                errorMessage.style.display = 'none';
+                playerContent.style.display = 'none';
+                
+                fetch(`/api/players/get/${id}`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            labels: {
-                                color: 'white',
-                                font: {
-                                    size: 14
-                                }
-                            },
-                            position: 'bottom'
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.raw + '/10';
-                                }
-                            },
-                            backgroundColor: 'rgba(26, 26, 46, 0.8)',
-                            titleFont: {
-                                size: 14
-                            },
-                            bodyFont: {
-                                size: 14
-                            },
-                            padding: 10,
-                            borderColor: '#3535A0',
-                            borderWidth: 1
+                        return response.json();
+                    })
+                    .then(data => {
+                        if (data.status === 'success' && data.data) {
+                            renderPlayerData(data.data);
+                        } else {
+                            console.error('Error fetching player data:', data.message || 'Unknown error');
+                            errorMessage.textContent = 'Error loading player data. Please try again later.';
+                            errorMessage.style.display = 'block';
                         }
-                    },
-                    responsive: true,
-                    maintainAspectRatio: false
+                        loadingSpinner.style.display = 'none';
+                    })
+                    .catch(error => {
+                        console.error('Error fetching player data:', error);
+                        errorMessage.textContent = 'Error loading player data. Please try again later.';
+                        errorMessage.style.display = 'block';
+                        loadingSpinner.style.display = 'none';
+                    });
+            }
+            
+            function renderPlayerData(player) {
+                // Set player basic info
+                document.getElementById('playerImage').src = `/assets/img/${player.player_id}.jpg`;
+                document.getElementById('playerImage').alt = `${player.name} ${player.surname}`;
+                document.getElementById('playerName').textContent = `${player.name} ${player.surname}`;
+                document.getElementById('playerBirthday').textContent = player.birthday;
+                document.getElementById('playerHeight').textContent = player.height;
+                
+                // Set team info if available
+                if (player.team) {
+                    document.getElementById('playerTeam').textContent = player.team;
+                    document.getElementById('playerTeamContainer').style.display = 'block';
+                } else {
+                    document.getElementById('playerTeamContainer').style.display = 'none';
                 }
-            });
-
-            // Animación al cargar la página
-            statsChart.canvas.parentNode.style.height = '300px';
+                
+                // Set stats
+                document.getElementById('playerDef').textContent = player.def;
+                document.getElementById('progressDef').style.width = `${player.def * 10}%`;
+                document.getElementById('progressDef').setAttribute('aria-valuenow', player.def);
+                
+                document.getElementById('playerSpd').textContent = player.spd;
+                document.getElementById('progressSpd').style.width = `${player.spd * 10}%`;
+                document.getElementById('progressSpd').setAttribute('aria-valuenow', player.spd);
+                
+                document.getElementById('playerOff').textContent = player.off;
+                document.getElementById('progressOff').style.width = `${player.off * 10}%`;
+                document.getElementById('progressOff').setAttribute('aria-valuenow', player.off);
+                
+                document.getElementById('playerPass').textContent = player.pass;
+                document.getElementById('progressPass').style.width = `${player.pass * 10}%`;
+                document.getElementById('progressPass').setAttribute('aria-valuenow', player.pass);
+                
+                document.getElementById('playerDrb').textContent = player.drb;
+                document.getElementById('progressDrb').style.width = `${player.drb * 10}%`;
+                document.getElementById('progressDrb').setAttribute('aria-valuenow', player.drb);
+                
+                document.getElementById('playerShoot').textContent = player.shoot;
+                document.getElementById('progressShoot').style.width = `${player.shoot * 10}%`;
+                document.getElementById('progressShoot').setAttribute('aria-valuenow', player.shoot);
+                
+                // Create radar chart
+                createRadarChart(player);
+                
+                // Show player content
+                playerContent.style.display = 'flex';
+            }
+            
+            function createRadarChart(player) {
+                const ctx = document.getElementById('statsRadarChart').getContext('2d');
+                
+                if (radarChart) {
+                    radarChart.destroy();
+                }
+                
+                radarChart = new Chart(ctx, {
+                    type: 'radar',
+                    data: {
+                        labels: [
+                            '{{ translations.defense }}', 
+                            '{{ translations.speed }}', 
+                            '{{ translations.offense }}',
+                            '{{ translations.passing }}',
+                            '{{ translations.dribbling }}',
+                            '{{ translations.shooting }}'
+                        ],
+                        datasets: [{
+                            label: `${player.name} ${player.surname}`,
+                            data: [
+                                player.def,
+                                player.spd,
+                                player.off,
+                                player.pass,
+                                player.drb,
+                                player.shoot
+                            ],
+                            backgroundColor: 'rgba(0, 0, 245, 0.2)',
+                            borderColor: '#3535A0',
+                            borderWidth: 2,
+                            pointBackgroundColor: '#0000F5',
+                            pointBorderColor: '#fff',
+                            pointHoverBackgroundColor: '#fff',
+                            pointHoverBorderColor: '#0000F5'
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                angleLines: {
+                                    color: 'rgba(255, 255, 255, 0.2)'
+                                },
+                                grid: {
+                                    color: 'rgba(255, 255, 255, 0.2)'
+                                },
+                                pointLabels: {
+                                    color: 'white',
+                                    font: {
+                                        size: 12,
+                                        weight: 'bold'
+                                    }
+                                },
+                                ticks: {
+                                    display: false,
+                                    stepSize: 2,
+                                    max: 10,
+                                    min: 0
+                                },
+                                suggestedMin: 0,
+                                suggestedMax: 10
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return context.raw + '/10';
+                                    }
+                                },
+                                backgroundColor: 'rgba(26, 26, 46, 0.8)',
+                                titleFont: {
+                                    size: 13
+                                },
+                                bodyFont: {
+                                    size: 13
+                                },
+                                padding: 8,
+                                borderColor: '#3535A0',
+                                borderWidth: 1
+                            }
+                        },
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
+                });
+            }
         });
     </script>
 {% endblock %}
@@ -277,34 +356,14 @@
     }
 
     .btn:hover {
-        background-color: #0000F5 !important;
-        color: white !important;
+        transform: translateY(-3px);
+        box-shadow: 0 5px 15px rgba(0, 0, 245, 0.2);
     }
-
-    /* Estilo scrollbar personalizado */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-
-    ::-webkit-scrollbar-track {
-        background: #1a1a2e;
-    }
-
-    ::-webkit-scrollbar-thumb {
-        background: #3535A0;
-        border-radius: 4px;
-    }
-
-    ::-webkit-scrollbar-thumb:hover {
-        background: #0000F5;
-    }
-
-    /* Estilos para el gráfico */
+    
     .chart-container {
-        margin: 0 auto;
         animation: fadeIn 1s ease-in-out;
     }
-
+    
     @keyframes fadeIn {
         from { opacity: 0; transform: scale(0.9); }
         to { opacity: 1; transform: scale(1); }

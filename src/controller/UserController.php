@@ -1,25 +1,35 @@
 <?php
-require_once __DIR__ . "/DatabaseController.php";
+require_once __DIR__ . "../DatabaseController.php";
 
 use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class UserController
 {
-
     private static $secretKey = "claveSecreta"; //Clave secreta para firmar el token
     private $connection; //Conexión a la base de datos
 
     public function __construct()
     { //Constructor de la clase
         $this->connection = DatabaseController::connect(); //Obtiene la conexión a la base de datos
-
     }
 
+    /**
+     * Register a new user
+     * @param string $username Username
+     * @param string $email Email
+     * @param string $name Name
+     * @param string $surname Surname
+     * @param string $password Password
+     * @return array Response with status and message
+     */
     public static function signUp($username, $email, $name, $surname, $password)
     { //Función para registrar un usuario
         if ((new self)->exist($email)) { //Verifica si el usuario ya existe
-            echo "Account already exists";
-            return;
+            return [
+                'status' => 'error',
+                'message' => 'Account already exists'
+            ];
         } else {
             try {
                 $sql = "INSERT into Users (username, email, name, surname, password) VALUES (:username, :email, :name, :surname, :password)"; //Consulta SQL
@@ -35,21 +45,32 @@ class UserController
                 $stmt->setFetchMode(PDO::FETCH_OBJ); //Establece el modo de recuperación de datos
                 $stmt->execute(); //Ejecuta la consulta
 
-                return true;
+                return [
+                    'status' => 'success',
+                    'message' => 'User registered successfully'
+                ];
             } catch (PDOException $error) {
-                echo $sql . "<br>" . $error->getMessage();
-                return false;
+                return [
+                    'status' => 'error',
+                    'message' => 'Database error: ' . $error->getMessage()
+                ];
             }
         }
     }
 
+    /**
+     * Sign in a user
+     * @param string $emailUsername Email or username
+     * @param string $password Password
+     * @return array Response with status, message and token if successful
+     */
     public static function signIn($emailUsername, $password)
     {
         $db = (new self())->connection;
 
         try {
             // Buscar al usuario por email o nombre de usuario
-            $sql = "SELECT id, username, email, password FROM Users WHERE email = :email OR username = :username";
+            $sql = "SELECT id, username, email, password, name, surname FROM Users WHERE email = :email OR username = :username";
             $stmt = $db->prepare($sql);
             $stmt->bindValue(':email', $emailUsername);
             $stmt->bindValue(':username', $emailUsername);
@@ -59,23 +80,50 @@ class UserController
 
             // Si el usuario no existe, devolver mensaje de error
             if (!$user) {
-                return "Account does not exist.";
+                return [
+                    'status' => 'error',
+                    'message' => 'Account does not exist.'
+                ];
             }
 
             // Comparar la contraseña ingresada con el hash almacenado
             if (!password_verify($password, $user['password'])) {
-                return "Incorrect password.";
+                return [
+                    'status' => 'error',
+                    'message' => 'Incorrect password.'
+                ];
             }
 
             // Generar token JWT para mantener la sesión
             $token = self::generateToken($user['id'], $user['username'], $user['email']);
 
-            // Guardar el token en una cookie
-            setcookie("token", $token, time() + 3600, "/", "", false, true);
+            // Registrar el inicio de sesión en el log
+            error_log('User logged in: ' . $user['username'] . ' (ID: ' . $user['id'] . ')');
+            error_log('User data: ' . json_encode([
+                'id' => $user['id'],
+                'username' => $user['username'],
+                'email' => $user['email'],
+                'name' => $user['name'],
+                'surname' => $user['surname']
+            ]));
 
-            return true; // Éxito
+            return [
+                'status' => 'success',
+                'message' => 'Login successful',
+                'token' => $token,
+                'user' => [
+                    'id' => $user['id'],
+                    'username' => $user['username'],
+                    'email' => $user['email'],
+                    'name' => $user['name'],
+                    'surname' => $user['surname']
+                ]
+            ];
         } catch (PDOException $error) {
-            return "Database error: " . $error->getMessage();
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $error->getMessage()
+            ];
         }
     }
 
@@ -129,5 +177,233 @@ class UserController
 
         $jwt = JWT::encode($payload, self::$secretKey, 'HS256'); //Firma el token
         return $jwt;
+    }
+
+    /**
+     * Process API requests for user endpoints
+     * @param string $method HTTP method
+     * @param string $action Action to perform
+     * @param array $data Request data
+     * @return array Response data
+     */
+    public static function processApiRequest($method, $action, $data = null) {
+        switch ($method) {
+            case 'POST':
+                if ($action === 'login') {
+                    // Aceptar tanto datos JSON como datos de formulario
+                    $emailUsername = $data['user'] ?? '';
+                    $password = $data['password'] ?? '';
+
+                    return self::signIn($emailUsername, $password);
+                } elseif ($action === 'register') {
+                    $name = $data['name'] ?? '';
+                    $surname = $data['surname'] ?? '';
+                    $username = $data['user'] ?? '';
+                    $email = $data['email'] ?? '';
+                    $password = $data['password'] ?? '';
+
+                    return self::signUp($username, $email, $name, $surname, $password);
+                } elseif ($action === 'update') {
+                    // Get token from Authorization header
+                    $token = self::getTokenFromRequest();
+
+                    if (!$token) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Authorization token required'
+                        ];
+                    }
+
+                    // Validate token and get user ID
+                    try {
+                        // Attempt to decode the token
+                        $key = new Key(self::$secretKey, 'HS256');
+                        $decoded = JWT::decode($token, $key);
+
+                        $userId = $decoded->id;
+
+                        // Update user profile
+                        return self::updateUserProfile($userId, $data);
+                    } catch (Exception $e) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Invalid token: ' . $e->getMessage()
+                        ];
+                    }
+                }
+                break;
+
+            case 'GET':
+                if ($action === 'profile') {
+                    // Get token from Authorization header
+                    $token = self::getTokenFromRequest();
+
+                    if (!$token) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Authorization token required'
+                        ];
+                    }
+
+                    // Validate token and get user data
+                    try {
+                        // Attempt to decode the token
+                        $key = new Key(self::$secretKey, 'HS256');
+                        $decoded = JWT::decode($token, $key);
+
+                        $userId = $decoded->id;
+
+                        // Get user profile data
+                        return self::getUserProfile($userId);
+                    } catch (Exception $e) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Invalid token: ' . $e->getMessage()
+                        ];
+                    }
+                }
+                break;
+
+            default:
+                return [
+                    'status' => 'error',
+                    'message' => 'Method not allowed'
+                ];
+        }
+
+        return [
+            'status' => 'error',
+            'message' => 'Invalid action'
+        ];
+    }
+
+    /**
+     * Get user profile data
+     * @param int $userId User ID
+     * @return array Response with status, message and user data
+     */
+    private static function getUserProfile($userId) {
+        try {
+            $sql = "SELECT id, username, email, name, surname FROM Users WHERE id = :id";
+            $stmt = (new self)->connection->prepare($sql);
+            $stmt->bindValue(':id', $userId);
+            $stmt->execute();
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                return [
+                    'status' => 'error',
+                    'message' => 'User not found'
+                ];
+            }
+
+            return [
+                'status' => 'success',
+                'message' => 'Profile data retrieved successfully',
+                'data' => $user
+            ];
+        } catch (PDOException $error) {
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $error->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Update user profile data
+     * @param int $userId User ID
+     * @param array $data User data to update
+     * @return array Response with status and message
+     */
+    private static function updateUserProfile($userId, $data) {
+        try {
+            // Check if password change is requested
+            if (!empty($data['currentPassword']) && !empty($data['newPassword'])) {
+                // Verify current password
+                $sql = "SELECT password FROM Users WHERE id = :id";
+                $stmt = (new self)->connection->prepare($sql);
+                $stmt->bindValue(':id', $userId);
+                $stmt->execute();
+
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+                if (!$user || !password_verify($data['currentPassword'], $user['password'])) {
+                    return [
+                        'status' => 'error',
+                        'message' => 'Current password is incorrect'
+                    ];
+                }
+
+                // Update user data with new password
+                $sql = "UPDATE Users SET name = :name, surname = :surname, password = :password WHERE id = :id";
+                $stmt = (new self)->connection->prepare($sql);
+                $stmt->bindValue(':name', $data['name']);
+                $stmt->bindValue(':surname', $data['surname']);
+                $stmt->bindValue(':password', password_hash($data['newPassword'], PASSWORD_DEFAULT));
+                $stmt->bindValue(':id', $userId);
+                $stmt->execute();
+            } else {
+                // Update user data without changing password
+                $sql = "UPDATE Users SET name = :name, surname = :surname WHERE id = :id";
+                $stmt = (new self)->connection->prepare($sql);
+                $stmt->bindValue(':name', $data['name']);
+                $stmt->bindValue(':surname', $data['surname']);
+                $stmt->bindValue(':id', $userId);
+                $stmt->execute();
+            }
+
+            // Get updated user data
+            $sql = "SELECT id, username, email FROM Users WHERE id = :id";
+            $stmt = (new self)->connection->prepare($sql);
+            $stmt->bindValue(':id', $userId);
+            $stmt->execute();
+
+            $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            return [
+                'status' => 'success',
+                'message' => 'Profile updated successfully',
+                'user' => $updatedUser
+            ];
+        } catch (PDOException $error) {
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $error->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Extract JWT token from request headers
+     * @return string|null Token or null if not found
+     */
+    private static function getTokenFromRequest() {
+        // Try to get headers using getallheaders() if available
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : 
+                         (isset($headers['authorization']) ? $headers['authorization'] : '');
+        } else {
+            // Fallback for servers without getallheaders()
+            $authHeader = '';
+
+            // Try to get the Authorization header from $_SERVER
+            if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
+                $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
+            } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
+                $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
+            } elseif (isset($_SERVER['HTTP_X_AUTHORIZATION'])) {
+                $authHeader = $_SERVER['HTTP_X_AUTHORIZATION'];
+            }
+        }
+
+        // Extract token from header
+        if (!empty($authHeader) && preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
+            return $matches[1];
+        }
+
+        return null;
     }
 }
