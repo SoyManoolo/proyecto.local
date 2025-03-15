@@ -231,12 +231,12 @@ def scraperStats():
 
         stats_data.append({
             "player_id": player_id,
-            "def": stat_values[0],
-            "spd": stat_values[1],
-            "off": stat_values[2],
-            "pass": stat_values[3],
-            "drb": stat_values[4],
-            "shoot": stat_values[5]
+            "spd": stat_values[0],
+            "def": stat_values[1],
+            "pass": stat_values[2],
+            "drb": stat_values[3],
+            "shoot": stat_values[4],
+            "off": stat_values[5]
         })
 
     driver.quit()

@@ -12,6 +12,7 @@ return [
     "name" => "Nombre",
     "surname" => "Apellido",
     "orlogin" => "O Inicia Sesión",
+    "profile" => "Perfil",
 
     // Información del Jugador
     "players" => "Jugadores",
@@ -20,6 +21,14 @@ return [
     "height" => "Altura",
     "team" => "Equipo",
     "image" => "Imagen",
+    "bluelock_players" => "Jugadores Blue Lock",
+    "search_player" => "Buscar jugador...",
+    "view_details" => "Ver Detalles",
+    "stats" => "Estadísticas",
+    "close" => "Cerrar",
+    "back_to_players" => "Volver a Jugadores",
+    "full_profile" => "Perfil Completo",
+    "stats_scale_info" => "Todas las estadísticas están valoradas en una escala del 1 al 10",
 
     // Estadísticas
     "defense" => "Defensa",

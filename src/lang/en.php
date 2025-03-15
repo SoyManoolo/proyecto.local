@@ -13,6 +13,7 @@ return [
     "name" => "Name",
     "surname" => "Surname",
     "orlogin" => "Or Log In",
+    "profile" => "Profile",
 
     // Player Info
     "players" => "Players",
@@ -21,6 +22,14 @@ return [
     "height" => "Height",
     "team" => "Team",
     "image" => "Image",
+    "bluelock_players" => "Blue Lock Players",
+    "search_player" => "Search player...",
+    "view_details" => "View Details",
+    "stats" => "Statistics",
+    "close" => "Close",
+    "back_to_players" => "Back to Players",
+    "full_profile" => "Full Profile",
+    "stats_scale_info" => "All stats are rated on a scale from 1 to 10",
 
     // Stats
     "defense" => "Defense",

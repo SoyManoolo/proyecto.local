@@ -4,8 +4,8 @@ class DatabaseController:
     def __init__(self):
         self.db = mysql.connector.connect(
             host="localhost",
-            user="usuario",
-            password="password",
+            user="root",
+            password="Doblemanuel0426.",
             database="BlueLock"
         )
         self.cursor = self.db.cursor()

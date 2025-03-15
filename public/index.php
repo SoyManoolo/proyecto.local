@@ -16,9 +16,80 @@ require_once __DIR__ . '/../src/controller/PlayerController.php';
 // Obtener la URL solicitada y limpiar los parámetros
 $request = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), "/");
 $chunks = explode("/", $request);
-$chunks[0] = strtolower($chunks[0]);
+$baseRoute = strtolower($chunks[0] ?? '');
 
-switch ($chunks[0]) {
+// Definir rutas para API
+$isApiRequest = $baseRoute === 'api';
+
+// Si es una solicitud a la API
+if ($isApiRequest) {
+    header('Content-Type: application/json');
+    $endpoint = $chunks[1] ?? '';
+    $action = $chunks[2] ?? '';
+    $id = $chunks[3] ?? null;
+
+    // Manejar solicitudes a la API
+    switch ($endpoint) {
+        case 'players':
+            if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+                if ($action === 'get' && $id) {
+                    // GET /api/players/get/{id}
+                    $player = PlayerController::getPlayerById($id);
+                    echo json_encode($player);
+                } else {
+                    // GET /api/players
+                    $players = PlayerController::getAllPlayers();
+                    echo json_encode($players);
+                }
+            }
+            break;
+
+        case 'users':
+            if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+                $data = json_decode(file_get_contents('php://input'), true);
+
+                if ($action === 'login') {
+                    // POST /api/users/login
+                    $emailUsername = $data['user'] ?? '';
+                    $password = $data['password'] ?? '';
+
+                    $loginResult = UserController::signIn($emailUsername, $password);
+
+                    if ($loginResult === true) {
+                        echo json_encode(['success' => true, 'message' => 'Login successful']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => $loginResult]);
+                    }
+                } elseif ($action === 'register') {
+                    // POST /api/users/register
+                    $name = $data['name'] ?? '';
+                    $surname = $data['surname'] ?? '';
+                    $username = $data['user'] ?? '';
+                    $email = $data['email'] ?? '';
+                    $password = $data['password'] ?? '';
+
+                    $signupResult = UserController::signUp($username, $email, $name, $surname, $password);
+
+                    if ($signupResult === true) {
+                        echo json_encode(['success' => true, 'message' => 'Registration successful']);
+                    } else {
+                        echo json_encode(['success' => false, 'message' => $signupResult]);
+                    }
+                }
+            }
+            break;
+
+        default:
+            http_response_code(404);
+            echo json_encode(['error' => 'Endpoint not found']);
+            break;
+    }
+    exit;
+}
+
+// Si no es una solicitud a la API, manejar las rutas normales
+switch ($baseRoute) {
+    case '':
     case 'home':
         $players = PlayerController::getAllPlayers();
         echo $twig->render('home.twig', [
@@ -69,6 +140,25 @@ switch ($chunks[0]) {
             }
         } else {
             echo $twig->render('signup.twig', ['translations' => $translations]);
+        }
+        break;
+
+    case 'player':
+        $id = $chunks[1] ?? null;
+        if ($id) {
+            $player = PlayerController::getPlayerById($id);
+            if ($player) {
+                echo $twig->render('player_detail.twig', [
+                    'translations' => $translations,
+                    'player' => $player
+                ]);
+            } else {
+                http_response_code(404);
+                echo $twig->render('404.twig', ['translations' => $translations]);
+            }
+        } else {
+            http_response_code(404);
+            echo $twig->render('404.twig', ['translations' => $translations]);
         }
         break;
 

@@ -1,0 +1,313 @@
+{% extends "layout.twig" %}
+
+{% block content %}
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1a1a2e; box-shadow: 0 4px 12px rgba(0, 0, 245, 0.15);">
+            <div class="container">
+                <a class="navbar-brand" href="/home">
+                    <img src="/assets/img/BlueLock_logo.svg" alt="Blue Lock Logo" class="img-fluid" style="max-width: 180px;">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
+                               data-bs-toggle="dropdown" aria-expanded="false">
+                               <i class="bi bi-list fs-4"></i>
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" 
+                                style="background-color: #1a1a2e; border-color: #3535A0; box-shadow: 0 5px 15px rgba(0, 0, 245, 0.2);">
+                                <li><a class="dropdown-item text-white" href="/profile">{{ translations.profile }}</a></li>
+                                <li><hr class="dropdown-divider" style="border-color: #3535A0;"></li>
+                                <li><a class="dropdown-item text-white" href="/login">{{ translations.logout }} <i class="bi bi-box-arrow-right"></i></a></li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container py-5">
+        <div class="mb-4">
+            <a href="/home" class="btn" style="background-color: transparent; color: white; border: 2px solid #3535A0; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                <i class="bi bi-arrow-left me-2"></i>{{ translations.back_to_players }}
+            </a>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card shadow-lg" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; border-radius: 12px; overflow: hidden;">
+                    <div class="position-relative text-center pt-5 pb-4" style="background-color: rgba(0, 0, 245, 0.1);">
+                        <img src="{{ '/assets/img/' ~ player.player_id ~ '.jpg' }}" alt="{{ player.name }} {{ player.surname }}"
+                             class="img-fluid rounded-circle mb-3" style="width: 200px; height: 200px; object-fit: cover; border: 3px solid #3535A0; box-shadow: 0 5px 15px rgba(53, 53, 160, 0.3);">
+                        <h2 class="text-white fw-bold mt-3">{{ player.name }} {{ player.surname }}</h2>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="mb-4">
+                            <p class="text-light mb-3"><i class="bi bi-calendar-event me-2"></i><strong>{{ translations.birthday }}:</strong> {{ player.birthday }}</p>
+                            <p class="text-light mb-3"><i class="bi bi-rulers me-2"></i><strong>{{ translations.height }}:</strong> {{ player.height }} cm</p>
+                            {% if player.team %}
+                            <p class="text-light mb-3"><i class="bi bi-people-fill me-2"></i><strong>{{ translations.team }}:</strong> {{ player.team }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card shadow-lg" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; border-radius: 12px; overflow: hidden;">
+                    <div class="card-header border-0 py-4" style="background-color: rgba(0, 0, 245, 0.2);">
+                        <h3 class="text-white fw-bold m-0">{{ translations.stats }}</h3>
+                    </div>
+                    <div class="card-body p-4">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <!-- Gráfico de radar para estadísticas -->
+                                <div class="chart-container" style="position: relative; height: 300px; width: 100%;">
+                                    <canvas id="statsRadarChart"></canvas>
+                                </div>
+
+                                <!-- Leyenda explicativa -->
+                                <div class="text-center mt-2">
+                                    <small class="text-light">
+                                        <i class="bi bi-info-circle me-1"></i> 
+                                        {{ translations.stats_scale_info }}
+                                    </small>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6">
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="text-light m-0">{{ translations.defense }}</h5>
+                                        <span class="text-white fw-bold fs-4">{{ player.def }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ player.def * 10 }}%; background-color: #3535A0;" 
+                                            aria-valuenow="{{ player.def }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="text-light m-0">{{ translations.speed }}</h5>
+                                        <span class="text-white fw-bold fs-4">{{ player.spd }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ player.spd * 10 }}%; background-color: #3535A0;" 
+                                            aria-valuenow="{{ player.spd }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="text-light m-0">{{ translations.offense }}</h5>
+                                        <span class="text-white fw-bold fs-4">{{ player.off }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ player.off * 10 }}%; background-color: #3535A0;" 
+                                            aria-valuenow="{{ player.off }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="text-light m-0">{{ translations.passing }}</h5>
+                                        <span class="text-white fw-bold fs-4">{{ player.pass }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ player.pass * 10 }}%; background-color: #3535A0;" 
+                                            aria-valuenow="{{ player.pass }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="text-light m-0">{{ translations.dribbling }}</h5>
+                                        <span class="text-white fw-bold fs-4">{{ player.drb }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ player.drb * 10 }}%; background-color: #3535A0;" 
+                                            aria-valuenow="{{ player.drb }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                    </div>
+                                </div>
+
+                                <div class="mb-4">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h5 class="text-light m-0">{{ translations.shooting }}</h5>
+                                        <span class="text-white fw-bold fs-4">{{ player.shoot }}</span>
+                                    </div>
+                                    <div class="progress" style="height: 12px; background-color: rgba(255, 255, 255, 0.1);">
+                                        <div class="progress-bar" role="progressbar" style="width: {{ player.shoot * 10 }}%; background-color: #3535A0;" 
+                                            aria-valuenow="{{ player.shoot }}" aria-valuemin="0" aria-valuemax="10"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <!-- Incluir Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuración del gráfico radar
+            const ctx = document.getElementById('statsRadarChart').getContext('2d');
+
+            // Datos del jugador
+            const playerData = {
+                defense: {{ player.def }},
+                speed: {{ player.spd }},
+                offense: {{ player.off }},
+                passing: {{ player.pass }},
+                dribbling: {{ player.drb }},
+                shooting: {{ player.shoot }}
+            };
+
+            // Crear el gráfico radar
+            const statsChart = new Chart(ctx, {
+                type: 'radar',
+                data: {
+                    labels: [
+                        '{{ translations.defense }}', 
+                        '{{ translations.speed }}', 
+                        '{{ translations.offense }}',
+                        '{{ translations.passing }}',
+                        '{{ translations.dribbling }}',
+                        '{{ translations.shooting }}'
+                    ],
+                    datasets: [{
+                        label: '{{ player.name }} {{ player.surname }}',
+                        data: [
+                            playerData.defense,
+                            playerData.speed,
+                            playerData.offense,
+                            playerData.passing,
+                            playerData.dribbling,
+                            playerData.shooting
+                        ],
+                        backgroundColor: 'rgba(0, 0, 245, 0.2)',
+                        borderColor: '#3535A0',
+                        borderWidth: 2,
+                        pointBackgroundColor: '#0000F5',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: '#0000F5'
+                    }]
+                },
+                options: {
+                    scales: {
+                        r: {
+                            angleLines: {
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.2)'
+                            },
+                            pointLabels: {
+                                color: 'white',
+                                font: {
+                                    size: 14,
+                                    weight: 'bold'
+                                }
+                            },
+                            ticks: {
+                                display: false,
+                                stepSize: 2,
+                                max: 10,
+                                min: 0
+                            },
+                            suggestedMin: 0,
+                            suggestedMax: 10
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.raw + '/10';
+                                }
+                            },
+                            backgroundColor: 'rgba(26, 26, 46, 0.8)',
+                            titleFont: {
+                                size: 14
+                            },
+                            bodyFont: {
+                                size: 14
+                            },
+                            padding: 10,
+                            borderColor: '#3535A0',
+                            borderWidth: 1
+                        }
+                    },
+                    responsive: true,
+                    maintainAspectRatio: false
+                }
+            });
+
+            // Animación al cargar la página
+            statsChart.canvas.parentNode.style.height = '300px';
+        });
+    </script>
+{% endblock %}
+
+{% block styles %}
+<style>
+    .progress-bar {
+        transition: width 1s ease-in-out;
+    }
+
+    .btn:hover {
+        background-color: #0000F5 !important;
+        color: white !important;
+    }
+
+    /* Estilo scrollbar personalizado */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+        background: #1a1a2e;
+    }
+
+    ::-webkit-scrollbar-thumb {
+        background: #3535A0;
+        border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+        background: #0000F5;
+    }
+
+    /* Estilos para el gráfico */
+    .chart-container {
+        margin: 0 auto;
+        animation: fadeIn 1s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+</style>
+{% endblock %}

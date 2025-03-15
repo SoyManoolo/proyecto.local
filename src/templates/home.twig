@@ -2,7 +2,7 @@
 
 {% block content %}
     <header>
-        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1a1a2e;">
+        <nav class="navbar navbar-expand-lg navbar-dark" style="background-color: #1a1a2e; box-shadow: 0 4px 12px rgba(0, 0, 245, 0.15);">
             <div class="container">
                 <a class="navbar-brand" href="/home">
                     <img src="assets/img/BlueLock_logo.svg" alt="Blue Lock Logo" class="img-fluid" style="max-width: 180px;">
@@ -16,13 +16,13 @@
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" 
                                data-bs-toggle="dropdown" aria-expanded="false">
-                               <i class="bi bi-person-circle fs-4"></i>
+                               <i class="bi bi-list fs-4"></i>
                             </a>
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" 
-                                style="background-color: #1a1a2e; border-color: #3535A0;">
-                                <li><a class="dropdown-item text-white" href="/profile">Profile</a></li>
+                                style="background-color: #1a1a2e; border-color: #3535A0; box-shadow: 0 5px 15px rgba(0, 0, 245, 0.2);">
+                                <li><a class="dropdown-item text-white" href="/profile">{{ translations.profile }}</a></li>
                                 <li><hr class="dropdown-divider" style="border-color: #3535A0;"></li>
-                                <li><a class="dropdown-item text-white" href="/login">Logout <i class="bi bi-box-arrow-right"></i></a></li>
+                                <li><a class="dropdown-item text-white" href="/login">{{ translations.logout }} <i class="bi bi-box-arrow-right"></i></a></li>
                             </ul>
                         </li>
                     </ul>
@@ -33,45 +33,35 @@
 
     <div class="container py-5">
         <div class="d-flex justify-content-between align-items-center mb-4">
-            <h1 class="text-white fw-bold"><span style="border-bottom: 4px solid #3535A0; padding-bottom: 5px;">Blue Lock Players</span></h1>
+            <h1 class="text-white fw-bold"><span style="border-bottom: 4px solid #0000F5; padding-bottom: 5px;">{{ translations.bluelock_players }}</span></h1>
             <div class="input-group" style="max-width: 300px;">
-                <input type="text" class="form-control" placeholder="Search player..." 
-                       style="background-color: #121225; color: white; border-color: #3535A0;">
-                <button class="btn btn-outline-light" type="button" style="border-color: #3535A0;">
+                <input type="text" class="form-control search-input" placeholder="{{ translations.search_player }}" 
+                       style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px 0 0 8px;">
+                <button class="btn" type="button" style="background-color: #0000F5; color: white; border: none; border-radius: 0 8px 8px 0;">
                     <i class="bi bi-search"></i>
                 </button>
-            </div>
-        </div>
-
-        <!-- Filtros -->
-        <div class="mb-4">
-            <div class="btn-group">
-                <button type="button" class="btn btn-sm active" style="background-color: #3535A0; color: white;">All</button>
-                <button type="button" class="btn btn-sm btn-outline-light">Strikers</button>
-                <button type="button" class="btn btn-sm btn-outline-light">Midfielders</button>
-                <button type="button" class="btn btn-sm btn-outline-light">Defenders</button>
             </div>
         </div>
 
         <div class="row g-4">
             {% for player in players %}
                 <div class="col-xl-3 col-lg-4 col-md-6 mb-4">
-                    <div class="card h-100" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; 
+                    <div class="card h-100 shadow-lg" style="background-color: rgba(26, 26, 46, 0.8); border: 2px solid #3535A0; 
                                               border-radius: 12px; overflow: hidden; transition: transform 0.3s ease, box-shadow 0.3s ease;">
                         <div class="position-relative">
                             <img src="{{ 'assets/img/' ~ player.player_id ~ '.jpg' }}" alt="{{ player.name }} {{ player.surname }}"
                                 class="card-img-top" style="height: 220px; object-fit: cover;">
-                            <div class="position-absolute bottom-0 start-0 bg-dark bg-opacity-75 text-white py-1 px-3">
+                            <div class="position-absolute bottom-0 start-0 w-100 bg-dark bg-opacity-75 text-white py-2 px-3">
                                 <span class="fw-bold">{{ player.name }} {{ player.surname }}</span>
                             </div>
                         </div>
                         <div class="card-body">
                             <div class="d-flex justify-content-between mb-3">
                                 <div>
-                                    <small class="text-light"><i class="bi bi-calendar-event"></i> {{ player.birthday }}</small>
+                                    <small class="text-light"><i class="bi bi-calendar-event me-2"></i> {{ player.birthday }}</small>
                                 </div>
                                 <div>
-                                    <small class="text-light"><i class="bi bi-rulers"></i> {{ player.height }} cm</small>
+                                    <small class="text-light"><i class="bi bi-rulers me-2"></i> {{ player.height }}</small>
                                 </div>
                             </div>
                             <div class="mt-3">
@@ -79,34 +69,101 @@
                                     <span class="text-light small">{{ translations.defense }}</span>
                                     <span class="text-white fw-bold">{{ player.def }}</span>
                                 </div>
-                                <div class="progress mb-2" style="height: 6px;">
+                                <div class="progress mb-2" style="height: 6px; background-color: rgba(255, 255, 255, 0.1);">
                                     <div class="progress-bar" role="progressbar" style="width: {{ player.def * 10 }}%; background-color: #3535A0;" 
                                         aria-valuenow="{{ player.def }}" aria-valuemin="0" aria-valuemax="10"></div>
                                 </div>
-                                
+
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-light small">{{ translations.speed }}</span>
                                     <span class="text-white fw-bold">{{ player.spd }}</span>
                                 </div>
-                                <div class="progress mb-2" style="height: 6px;">
+                                <div class="progress mb-2" style="height: 6px; background-color: rgba(255, 255, 255, 0.1);">
                                     <div class="progress-bar" role="progressbar" style="width: {{ player.spd * 10 }}%; background-color: #3535A0;" 
                                         aria-valuenow="{{ player.spd }}" aria-valuemin="0" aria-valuemax="10"></div>
                                 </div>
-                                
+
                                 <div class="d-flex justify-content-between mb-1">
                                     <span class="text-light small">{{ translations.offense }}</span>
                                     <span class="text-white fw-bold">{{ player.off }}</span>
                                 </div>
-                                <div class="progress" style="height: 6px;">
+                                <div class="progress" style="height: 6px; background-color: rgba(255, 255, 255, 0.1);">
                                     <div class="progress-bar" role="progressbar" style="width: {{ player.off * 10 }}%; background-color: #3535A0;" 
                                         aria-valuenow="{{ player.off }}" aria-valuemin="0" aria-valuemax="10"></div>
                                 </div>
                             </div>
                         </div>
-                        <div class="card-footer border-0" style="background-color: rgba(26, 26, 46, 1);">
-                            <button class="btn btn-sm w-100" style="background-color: #3535A0; color: white;">
-                                View Details
-                            </button>
+                        <div class="card-footer border-0 p-3" style="background-color: rgba(26, 26, 46, 1);">
+                            <div class="d-grid gap-2">
+                                <button class="btn view-details-btn" data-bs-toggle="modal" data-bs-target="#playerModal-{{ player.player_id }}" 
+                                        style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                    <i class="bi bi-eye-fill me-2"></i>{{ translations.view_details }}
+                                </button>
+                                <a href="/player/{{ player.player_id }}" class="btn" 
+                                   style="background-color: transparent; color: white; border: 2px solid #3535A0; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                    <i class="bi bi-arrow-right me-2"></i>{{ translations.full_profile }}
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal para cada jugador -->
+                <div class="modal fade" id="playerModal-{{ player.player_id }}" tabindex="-1" aria-labelledby="playerModalLabel-{{ player.player_id }}" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg">
+                        <div class="modal-content" style="background-color: rgba(26, 26, 46, 0.95); border: 2px solid #3535A0; border-radius: 12px;">
+                            <div class="modal-header border-0" style="background-color: rgba(0, 0, 245, 0.2);">
+                                <h5 class="modal-title text-white fw-bold" id="playerModalLabel-{{ player.player_id }}">{{ player.name }} {{ player.surname }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body" 
+                                 data-def="{{ player.def }}" 
+                                 data-spd="{{ player.spd }}" 
+                                 data-off="{{ player.off }}" 
+                                 data-pass="{{ player.pass }}" 
+                                 data-drb="{{ player.drb }}" 
+                                 data-shoot="{{ player.shoot }}"
+                                 data-name="{{ player.name }} {{ player.surname }}">
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <img src="{{ 'assets/img/' ~ player.player_id ~ '.jpg' }}" alt="{{ player.name }} {{ player.surname }}"
+                                             class="img-fluid rounded-circle mb-3" style="width: 180px; height: 180px; object-fit: cover; border: 3px solid #3535A0; box-shadow: 0 5px 15px rgba(53, 53, 160, 0.3);">
+                                        <div class="mt-3">
+                                            <p class="text-light mb-2"><i class="bi bi-calendar-event me-2"></i><strong>{{ translations.birthday }}:</strong> {{ player.birthday }}</p>
+                                            <p class="text-light mb-2"><i class="bi bi-rulers me-2"></i><strong>{{ translations.height }}:</strong> {{ player.height }} cm</p>
+                                            {% if player.team %}
+                                            <p class="text-light mb-2"><i class="bi bi-people-fill me-2"></i><strong>{{ translations.team }}:</strong> {{ player.team }}</p>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h6 class="text-white mt-2 mb-3">{{ translations.stats }}</h6>
+                                        
+                                        <!-- Gráfico de radar para estadísticas -->
+                                        <div class="chart-container mb-3" style="position: relative; height: 250px; width: 100%;">
+                                            <canvas id="playerChart-{{ player.player_id }}"></canvas>
+                                        </div>
+                                        
+                                        <!-- Leyenda explicativa -->
+                                        <div class="text-center">
+                                            <small class="text-light">
+                                                <i class="bi bi-info-circle me-1"></i> 
+                                                {{ translations.stats_scale_info }}
+                                            </small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="modal-footer border-0" style="background-color: rgba(26, 26, 46, 1);">
+                                <a href="/player/{{ player.player_id }}" class="btn" 
+                                   style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                    <i class="bi bi-arrow-right me-2"></i>{{ translations.full_profile }}
+                                </a>
+                                <button type="button" class="btn" data-bs-dismiss="modal" 
+                                        style="background-color: transparent; color: white; border: 2px solid #3535A0; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                                    {{ translations.close }}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -115,38 +172,224 @@
     </div>
 {% endblock %}
 
+{% block scripts %}
+    <!-- Incluir Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar los gráficos cuando se abren los modales
+            const modals = document.querySelectorAll('.modal');
+            
+            modals.forEach(modal => {
+                modal.addEventListener('shown.bs.modal', function() {
+                    const playerId = this.id.split('-')[1];
+                    const chartCanvas = document.getElementById('playerChart-' + playerId);
+                    const modalBody = document.querySelector('#playerModal-' + playerId + ' .modal-body');
+                    
+                    // Si ya existe un gráfico, destruirlo para evitar duplicados
+                    if (chartCanvas._chart) {
+                        chartCanvas._chart.destroy();
+                    }
+                    
+                    // Obtener datos del jugador desde los atributos data
+                    const playerStats = {
+                        defense: parseInt(modalBody.getAttribute('data-def')),
+                        speed: parseInt(modalBody.getAttribute('data-spd')),
+                        offense: parseInt(modalBody.getAttribute('data-off')),
+                        passing: parseInt(modalBody.getAttribute('data-pass')),
+                        dribbling: parseInt(modalBody.getAttribute('data-drb')),
+                        shooting: parseInt(modalBody.getAttribute('data-shoot'))
+                    };
+                    
+                    const playerName = modalBody.getAttribute('data-name');
+                    
+                    // Crear el gráfico radar
+                    const ctx = chartCanvas.getContext('2d');
+                    chartCanvas._chart = new Chart(ctx, {
+                        type: 'radar',
+                        data: {
+                            labels: [
+                                '{{ translations.defense }}', 
+                                '{{ translations.speed }}', 
+                                '{{ translations.offense }}',
+                                '{{ translations.passing }}',
+                                '{{ translations.dribbling }}',
+                                '{{ translations.shooting }}'
+                            ],
+                            datasets: [{
+                                label: playerName,
+                                data: [
+                                    playerStats.defense,
+                                    playerStats.speed,
+                                    playerStats.offense,
+                                    playerStats.passing,
+                                    playerStats.dribbling,
+                                    playerStats.shooting
+                                ],
+                                backgroundColor: 'rgba(0, 0, 245, 0.2)',
+                                borderColor: '#3535A0',
+                                borderWidth: 2,
+                                pointBackgroundColor: '#0000F5',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: '#0000F5'
+                            }]
+                        },
+                        options: {
+                            scales: {
+                                r: {
+                                    angleLines: {
+                                        color: 'rgba(255, 255, 255, 0.2)'
+                                    },
+                                    grid: {
+                                        color: 'rgba(255, 255, 255, 0.2)'
+                                    },
+                                    pointLabels: {
+                                        color: 'white',
+                                        font: {
+                                            size: 12,
+                                            weight: 'bold'
+                                        }
+                                    },
+                                    ticks: {
+                                        display: false,
+                                        stepSize: 2,
+                                        max: 10,
+                                        min: 0
+                                    },
+                                    suggestedMin: 0,
+                                    suggestedMax: 10
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.raw + '/10';
+                                        }
+                                    },
+                                    backgroundColor: 'rgba(26, 26, 46, 0.8)',
+                                    titleFont: {
+                                        size: 13
+                                    },
+                                    bodyFont: {
+                                        size: 13
+                                    },
+                                    padding: 8,
+                                    borderColor: '#3535A0',
+                                    borderWidth: 1
+                                }
+                            },
+                            responsive: true,
+                            maintainAspectRatio: false
+                        }
+                    });
+                });
+            });
+        });
+    </script>
+{% endblock %}
+
 {% block styles %}
 <style>
     .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(53, 53, 160, 0.3);
+        box-shadow: 0 10px 20px rgba(0, 0, 245, 0.3);
     }
-    
+
     .btn-outline-light {
         transition: all 0.3s;
     }
-    
+
     .btn-outline-light:hover {
-        background-color: #3535A0;
-        border-color: #3535A0;
+        background-color: #0000F5;
+        border-color: #0000F5;
+    }
+
+    .dropdown-item {
+        transition: all 0.2s;
+        padding: 10px 15px;
+    }
+
+    .dropdown-item:hover {
+        background-color: #0000F5;
+    }
+
+    /* Estilos para el placeholder en todos los navegadores */
+    .search-input::placeholder {
+        color: white !important;
+        opacity: 1 !important;
     }
     
+    /* Para Firefox */
+    .search-input::-moz-placeholder {
+        color: white !important;
+        opacity: 1 !important;
+    }
+    
+    /* Para Internet Explorer */
+    .search-input:-ms-input-placeholder {
+        color: white !important;
+        opacity: 1 !important;
+    }
+    
+    /* Para Edge */
+    .search-input::-ms-input-placeholder {
+        color: white !important;
+        opacity: 1 !important;
+    }
+    
+    /* Para Chrome, Safari y Opera */
+    .search-input::-webkit-input-placeholder {
+        color: white !important;
+        opacity: 1 !important;
+    }
+
+    /* Estilo para el modal */
+    .modal-content {
+        box-shadow: 0 10px 30px rgba(0, 0, 245, 0.3);
+    }
+    
+    .btn-close-white {
+        filter: invert(1) grayscale(100%) brightness(200%);
+    }
+
     /* Estilo scrollbar personalizado */
     ::-webkit-scrollbar {
         width: 8px;
     }
-    
+
     ::-webkit-scrollbar-track {
         background: #1a1a2e;
     }
-    
+
     ::-webkit-scrollbar-thumb {
         background: #3535A0;
         border-radius: 4px;
     }
-    
+
     ::-webkit-scrollbar-thumb:hover {
-        background: #4545B0;
+        background: #0000F5;
+    }
+    
+    /* Estilos para el gráfico */
+    .chart-container {
+        margin: 0 auto;
+        animation: fadeIn 1s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: scale(0.9); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    
+    /* Estilos para las etiquetas del gráfico */
+    canvas {
+        max-width: 100%;
     }
 </style>
 {% endblock %}
