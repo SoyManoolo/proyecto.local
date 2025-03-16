@@ -1,4 +1,11 @@
 <?php
+/**
+ * Controlador de Usuarios
+ *
+ * Este controlador maneja todas las operaciones relacionadas con los usuarios,
+ * incluyendo registro, inicio de sesión, actualización de perfil y verificación de roles.
+ * También se encarga de la generación y validación de tokens JWT para la autenticación.
+ */
 require_once __DIR__ . "../DatabaseController.php";
 
 use Firebase\JWT\JWT;
@@ -6,22 +13,35 @@ use Firebase\JWT\Key;
 
 class UserController
 {
-    private static $secretKey = "claveSecreta"; //Clave secreta para firmar el token
+    /**
+     * Clave secreta para firmar los tokens JWT
+     * @var string
+     */
+    public static $secretKey = "claveSecreta"; //Clave secreta para firmar el token
+
+    /**
+     * Conexión a la base de datos
+     * @var PDO
+     */
     private $connection; //Conexión a la base de datos
 
+    /**
+     * Constructor que inicializa la conexión a la base de datos
+     */
     public function __construct()
     { //Constructor de la clase
         $this->connection = DatabaseController::connect(); //Obtiene la conexión a la base de datos
     }
 
     /**
-     * Register a new user
-     * @param string $username Username
-     * @param string $email Email
-     * @param string $name Name
-     * @param string $surname Surname
-     * @param string $password Password
-     * @return array Response with status and message
+     * Registra un nuevo usuario en el sistema
+     *
+     * @param string $username Nombre de usuario
+     * @param string $email Correo electrónico
+     * @param string $name Nombre
+     * @param string $surname Apellido
+     * @param string $password Contraseña
+     * @return array Respuesta con estado y mensaje
      */
     public static function signUp($username, $email, $name, $surname, $password)
     { //Función para registrar un usuario
@@ -59,10 +79,11 @@ class UserController
     }
 
     /**
-     * Sign in a user
-     * @param string $emailUsername Email or username
-     * @param string $password Password
-     * @return array Response with status, message and token if successful
+     * Inicia sesión de un usuario verificando sus credenciales
+     *
+     * @param string $emailUsername Correo electrónico o nombre de usuario
+     * @param string $password Contraseña
+     * @return array Respuesta con estado, mensaje y token si es exitoso
      */
     public static function signIn($emailUsername, $password)
     {
@@ -127,6 +148,12 @@ class UserController
         }
     }
 
+    /**
+     * Verifica si un usuario ya existe en la base de datos
+     *
+     * @param string $emailUsername Correo electrónico o nombre de usuario
+     * @return bool True si el usuario existe, false en caso contrario
+     */
     public static function exist($emailUsername): bool
     { //Función para verificar si un usuario ya existe
         if (str_contains($emailUsername, "@")) { //Verifica si el parámetro es un email
@@ -165,6 +192,14 @@ class UserController
         }
     }
 
+    /**
+     * Genera un token JWT para la autenticación del usuario
+     *
+     * @param int $id ID del usuario
+     * @param string $username Nombre de usuario
+     * @param string $email Correo electrónico
+     * @return string Token JWT generado
+     */
     public static function generateToken($id, $username, $email)
     { //Función para generar un token JWT
         $payload = [
@@ -180,11 +215,12 @@ class UserController
     }
 
     /**
-     * Process API requests for user endpoints
-     * @param string $method HTTP method
-     * @param string $action Action to perform
-     * @param array $data Request data
-     * @return array Response data
+     * Procesa las solicitudes API para los endpoints de usuario
+     *
+     * @param string $method Método HTTP
+     * @param string $action Acción a realizar
+     * @param array $data Datos de la solicitud
+     * @return array Datos de respuesta
      */
     public static function processApiRequest($method, $action, $data = null) {
         switch ($method) {
@@ -230,6 +266,33 @@ class UserController
                             'message' => 'Invalid token: ' . $e->getMessage()
                         ];
                     }
+                } elseif ($action === 'isAdmin') {
+                    // Get token from Authorization header
+                    $token = self::getTokenFromRequest();
+
+                    if (!$token) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Authorization token required'
+                        ];
+                    }
+
+                    // Validate token and get user ID
+                    try {
+                        // Attempt to decode the token
+                        $key = new Key(self::$secretKey, 'HS256');
+                        $decoded = JWT::decode($token, $key);
+
+                        $userId = $decoded->id;
+
+                        // Check if user is admin
+                        return self::isAdmin($userId);
+                    } catch (Exception $e) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Invalid token: ' . $e->getMessage()
+                        ];
+                    }
                 }
                 break;
 
@@ -261,6 +324,45 @@ class UserController
                             'message' => 'Invalid token: ' . $e->getMessage()
                         ];
                     }
+                } elseif ($action === 'check-admin') {
+                    // Get token from Authorization header
+                    $token = self::getTokenFromRequest();
+
+                    if (!$token) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Authorization token required'
+                        ];
+                    }
+
+                    // Validate token and get user ID
+                    try {
+                        // Attempt to decode the token
+                        $key = new Key(self::$secretKey, 'HS256');
+                        $decoded = JWT::decode($token, $key);
+
+                        $userId = $decoded->id;
+
+                        // Check if user is admin
+                        $result = self::isAdmin($userId);
+
+                        if ($result['status'] === 'success') {
+                            return [
+                                'status' => 'success',
+                                'isAdmin' => true
+                            ];
+                        } else {
+                            return [
+                                'status' => 'success',
+                                'isAdmin' => false
+                            ];
+                        }
+                    } catch (Exception $e) {
+                        return [
+                            'status' => 'error',
+                            'message' => 'Invalid token: ' . $e->getMessage()
+                        ];
+                    }
                 }
                 break;
 
@@ -278,9 +380,10 @@ class UserController
     }
 
     /**
-     * Get user profile data
-     * @param int $userId User ID
-     * @return array Response with status, message and user data
+     * Obtiene los datos del perfil de un usuario
+     *
+     * @param int $userId ID del usuario
+     * @return array Respuesta con estado, mensaje y datos del usuario
      */
     private static function getUserProfile($userId) {
         try {
@@ -312,10 +415,11 @@ class UserController
     }
 
     /**
-     * Update user profile data
-     * @param int $userId User ID
-     * @param array $data User data to update
-     * @return array Response with status and message
+     * Actualiza los datos del perfil de un usuario
+     *
+     * @param int $userId ID del usuario
+     * @param array $data Datos del usuario a actualizar
+     * @return array Respuesta con estado y mensaje
      */
     private static function updateUserProfile($userId, $data) {
         try {
@@ -376,8 +480,50 @@ class UserController
     }
 
     /**
-     * Extract JWT token from request headers
-     * @return string|null Token or null if not found
+     * Verifica si un usuario tiene rol de administrador
+     *
+     * @param int $userId ID del usuario
+     * @return array Respuesta con estado y mensaje
+     */
+    private static function isAdmin($userId) {
+        try {
+            $sql = "SELECT role FROM Users WHERE id = :id";
+            $stmt = (new self)->connection->prepare($sql);
+            $stmt->bindValue(':id', $userId);
+            $stmt->execute();
+
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if (!$user) {
+                return [
+                    'status' => 'error',
+                    'message' => 'User not found'
+                ];
+            }
+
+            if ($user['role'] === 'admin') {
+                return [
+                    'status' => 'success',
+                    'message' => 'User is admin'
+                ];
+            } else {
+                return [
+                    'status' => 'error',
+                    'message' => 'User is not admin'
+                ];
+            }
+        } catch (PDOException $error) {
+            return [
+                'status' => 'error',
+                'message' => 'Database error: ' . $error->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Extrae el token JWT de los encabezados de la solicitud
+     *
+     * @return string|null Token o null si no se encuentra
      */
     private static function getTokenFromRequest() {
         // Try to get headers using getallheaders() if available

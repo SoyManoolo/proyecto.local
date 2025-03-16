@@ -31,8 +31,8 @@ CREATE TABLE `Player` (
   `player_id` int NOT NULL,
   `name` varchar(100) NOT NULL,
   `surname` varchar(100) NOT NULL,
-  `birthday` date NOT NULL,
-  `height` decimal(5,2) NOT NULL
+  `birthday` varchar(100) NOT NULL,
+  `height` varchar(100) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- --------------------------------------------------------
@@ -65,6 +65,7 @@ CREATE TABLE `Users` (
   `name` varchar(100) NOT NULL,
   `surname` varchar(100) NOT NULL,
   `password` varchar(255) NOT NULL,
+  `role` varchar(20) DEFAULT 'user',
   `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
@@ -72,9 +73,6 @@ CREATE TABLE `Users` (
 --
 -- Volcado de datos para la tabla `Users`
 --
-
-INSERT INTO `Users` (`id`, `username`, `email`, `name`, `surname`, `password`, `created_at`, `updated_at`) VALUES
-(6, 'soymanolo', 'erik.saldi.diaz@gmail.com', 'Erik Manuel', 'Saldaña Diaz', '$2y$10$gF8sseaAfUBrWDQZlLdaf.7LolTaBjkf5eXJSt69Hx970iLV4sB36', '2025-03-10 15:40:07', '2025-03-10 15:40:07');
 
 --
 -- Índices para tablas volcadas

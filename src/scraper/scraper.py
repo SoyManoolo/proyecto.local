@@ -8,6 +8,23 @@ import requests
 import os
 import requests
 
+"""
+Módulo Scraper para Blue Lock
+
+Este módulo contiene funcionalidades para:
+1. Obtener estadísticas de jugadores de Blue Lock mediante web scraping
+2. Descargar y almacenar imágenes de los personajes
+3. Almacenar datos en la base de datos del sistema
+"""
+
+"""
+Lista de personajes con sus metadatos básicos
+
+Cada entrada contiene:
+- nombre: Nombre del personaje
+- apellido: Apellido del personaje
+- url: Enlace a su página en la wikia de Blue Lock
+"""
 personajes = [
     {
         "nombre": "Yoichi",
@@ -168,6 +185,21 @@ personajes = [
 
 
 def scraperStats():
+    """
+    Obtiene las estadísticas de los jugadores desde la web de Blue Lock
+
+    Utiliza Selenium para:
+    - Automatizar la navegación en el sitio web
+    - Extraer valores numéricos de las estadísticas
+    - Almacenar los datos en la base de datos mediante DatabaseController
+
+    Returns:
+        list: Lista de diccionarios con las estadísticas de cada jugador
+
+    Raises:
+        WebDriverException: Si hay problemas con el navegador o la conexión
+        DatabaseError: Si falla la inserción en la base de datos
+    """
     driver = webdriver.Chrome()
     driver.get("https://blue-lock-marcelones.vercel.app/")
 
@@ -213,6 +245,21 @@ os.makedirs(IMAGE_FOLDER, exist_ok=True)  # Asegura que la carpeta exista
 db_controller = DatabaseController()  # Conexión con la base de datos
 
 def scraperStats():
+    """
+    Obtiene las estadísticas de los jugadores desde la web de Blue Lock
+
+    Utiliza Selenium para:
+    - Automatizar la navegación en el sitio web
+    - Extraer valores numéricos de las estadísticas
+    - Almacenar los datos en la base de datos mediante DatabaseController
+
+    Returns:
+        list: Lista de diccionarios con las estadísticas de cada jugador
+
+    Raises:
+        WebDriverException: Si hay problemas con el navegador o la conexión
+        DatabaseError: Si falla la inserción en la base de datos
+    """
     driver = webdriver.Chrome()
     driver.get("https://blue-lock-marcelones.vercel.app/")
 
@@ -246,6 +293,18 @@ def scraperStats():
     print("Estadísticas insertadas en MySQL")
 
 def scraperPlayers():
+    """
+    Descarga y almacena imágenes de los personajes de Blue Lock
+
+    Funcionalidades principales:
+    - Descarga imágenes desde URLs especificadas en la lista 'personajes'
+    - Guarda las imágenes en la carpeta 'public/assets/img/'
+    - Registra las rutas de las imágenes en la base de datos
+
+    Raises:
+        requests.exceptions.RequestException: Si falla la descarga de imágenes
+        IOError: Si hay problemas guardando los archivos locales
+    """
     driver = webdriver.Chrome()
     wait = WebDriverWait(driver, 5)
 
