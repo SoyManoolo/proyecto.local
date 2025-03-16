@@ -21,6 +21,9 @@
                             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown" 
                                 style="background-color: #1a1a2e; border-color: #3535A0; box-shadow: 0 5px 15px rgba(0, 0, 245, 0.2);">
                                 <li><a class="dropdown-item text-white" href="/profile">{{ translations.profile }}</a></li>
+                                <li><a class="dropdown-item text-white" href="/admin">
+                                    <i class="bi bi-gear-fill me-2"></i> {{ translations.admin_panel }}
+                                </a></li>
                                 <li><hr class="dropdown-divider" style="border-color: #3535A0;"></li>
                                 <li><a class="dropdown-item text-white logout-btn" href="#" data-bs-toggle="modal" data-bs-target="#logoutModal"><i class="bi bi-box-arrow-right me-2"></i>{{ translations.logout }}</a></li>
                             </ul>
@@ -45,9 +48,9 @@
 
         <div id="loadingSpinner" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">{{ translations.loading }}</span>
             </div>
-            <p class="text-white mt-3">Loading players...</p>
+            <p class="text-white mt-3">{{ translations.loading_players }}</p>
         </div>
 
         <div id="playersContainer" class="row g-4" style="display: none;">
@@ -55,7 +58,7 @@
         </div>
 
         <div id="noPlayersMessage" class="alert alert-info text-center" style="display: none; background-color: rgba(26, 26, 46, 0.8); color: white; border: 2px solid #3535A0;">
-            No players found matching your search.
+            {{ translations.no_players_found }}
         </div>
     </div>
 
@@ -132,6 +135,9 @@
             let allPlayers = [];
             let statsChart = null;
 
+            // Crear una sola instancia del modal de logout
+            const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
+
             // Fetch all players from API
             fetchPlayers();
 
@@ -141,6 +147,27 @@
                 if (event.key === 'Enter') {
                     filterPlayers();
                 }
+            });
+
+            // Manejar clic en botón de logout
+            document.querySelectorAll('.logout-btn').forEach(button => {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    console.log('Mostrando modal de logout');
+                    logoutModal.show();
+                });
+            });
+
+            // Manejar clic en botón de confirmar logout
+            document.getElementById('confirmLogout')?.addEventListener('click', function() {
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                window.location.href = '/login';
+            });
+
+            // Listener para confirmar que el modal se cierra correctamente
+            document.getElementById('logoutModal').addEventListener('hidden.bs.modal', function () {
+                console.log('Modal de logout cerrado correctamente');
             });
 
             function fetchPlayers() {
@@ -365,25 +392,6 @@
                 const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
                 playerModal.show();
             }
-
-            document.querySelectorAll('.logout-btn').forEach(button => {
-                button.addEventListener('click', function(event) {
-                    event.preventDefault();
-                    // Show logout confirmation modal
-                    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-                    logoutModal.show();
-                });
-            });
-
-            // Handle confirm logout button click
-            document.getElementById('confirmLogout')?.addEventListener('click', function() {
-                // Clear local storage
-                localStorage.removeItem('token');
-                localStorage.removeItem('user');
-
-                // Redirect to login page
-                window.location.href = '/login';
-            });
         });
     </script>
 {% endblock %}

@@ -57,7 +57,7 @@
                                     <small class="form-text text-muted">{{ translations.email_cannot_change }}</small>
                                 </div>
                             </div>
-                            
+
                             <div class="row mb-3">
                                 <div class="col-md-6 mb-3 mb-md-0">
                                     <label for="name" class="form-label text-white">{{ translations.name }}</label>
@@ -70,9 +70,9 @@
                                            style="background-color: #121225; color: white; border: 2px solid #3535A0; border-radius: 8px;">
                                 </div>
                             </div>
-                            
+
                             <hr style="border-color: #3535A0; opacity: 0.5;" class="my-4">
-                            
+
                             <h5 class="text-white mb-3">{{ translations.change_password }}</h5>
                             <div class="mb-3">
                                 <label for="currentPassword" class="form-label text-white">{{ translations.current_password }}</label>
@@ -85,7 +85,7 @@
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="newPassword" class="form-label text-white">{{ translations.new_password }}</label>
                                 <div class="input-group">
@@ -97,7 +97,7 @@
                                     </button>
                                 </div>
                             </div>
-                            
+
                             <div class="mb-4">
                                 <label for="confirmPassword" class="form-label text-white">{{ translations.confirm_password }}</label>
                                 <div class="input-group">
@@ -110,7 +110,7 @@
                                 </div>
                                 <small class="form-text text-muted">{{ translations.leave_blank_no_change }}</small>
                             </div>
-                            
+
                             <div class="d-grid">
                                 <button type="submit" class="btn btn-lg" id="saveProfileBtn"
                                         style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600;">
@@ -129,20 +129,18 @@
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content" style="background-color: rgba(26, 26, 46, 0.95); border: 2px solid #3535A0; border-radius: 12px;">
                 <div class="modal-header border-0" style="background-color: rgba(0, 0, 245, 0.2);">
-                    <h5 class="modal-title text-white" id="logoutModalLabel">{{ translations.logout_confirmation }}</h5>
+                    <h5 class="modal-title text-white fw-bold" id="logoutModalLabel">{{ translations.logout }}</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body text-white">
-                    {{ translations.logout_confirm_message }}
+                <div class="modal-body">
+                    <p class="text-white">{{ translations.logout_confirmation }}</p>
                 </div>
                 <div class="modal-footer border-0">
-                    <button type="button" class="btn" data-bs-dismiss="modal"
-                            style="background-color: #3535A0; color: white; border: none; border-radius: 8px;">
+                    <button type="button" class="btn" data-bs-dismiss="modal" style="background-color: transparent; color: white; border: 2px solid #3535A0; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
                         {{ translations.cancel }}
                     </button>
-                    <button type="button" class="btn" id="confirmLogout"
-                            style="background-color: #0000F5; color: white; border: none; border-radius: 8px;">
-                        <i class="bi bi-box-arrow-right me-2"></i>{{ translations.logout }}
+                    <button type="button" id="confirmLogout" class="btn" style="background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600; transition: all 0.3s;">
+                        {{ translations.logout }}
                     </button>
                 </div>
             </div>
@@ -160,20 +158,20 @@
             const logoutBtn = document.querySelector('.logout-btn');
             const confirmLogoutBtn = document.getElementById('confirmLogout');
             const togglePasswordBtns = document.querySelectorAll('.toggle-password');
-            
+
             // Comprobar que los elementos existen
             if (!profileForm || !profileAlert || !saveProfileBtn) {
                 console.error('No se encontraron elementos necesarios del formulario');
                 return;
             }
-            
+
             // Inicializar botones de toggle password
             togglePasswordBtns.forEach(function(btn) {
                 btn.addEventListener('click', function() {
                     const targetId = this.getAttribute('data-target');
                     const passwordInput = document.getElementById(targetId);
                     const icon = this.querySelector('i');
-                    
+
                     if (passwordInput.type === 'password') {
                         passwordInput.type = 'text';
                         icon.classList.remove('bi-eye');
@@ -185,10 +183,10 @@
                     }
                 });
             });
-            
+
             // Cargar datos del perfil
             loadUserProfile();
-            
+
             // Manejar envío del formulario
             if (profileForm) {
                 profileForm.addEventListener('submit', function(e) {
@@ -196,7 +194,7 @@
                     updateProfile();
                 });
             }
-            
+
             // Manejar clic en botón de logout
             if (logoutBtn) {
                 logoutBtn.addEventListener('click', function(e) {
@@ -205,73 +203,73 @@
                     logoutModal.show();
                 });
             }
-            
+
             // Manejar clic en botón de confirmar logout
             if (confirmLogoutBtn) {
                 confirmLogoutBtn.addEventListener('click', function() {
                     logout();
                 });
             }
-            
+
             // Función para cargar datos del perfil de usuario
             function loadUserProfile() {
                 console.log('Cargando perfil de usuario...');
-                
+
                 // Obtener token del localStorage
                 const token = localStorage.getItem('token');
                 console.log('Token encontrado:', token ? 'Sí' : 'No');
-                
+
                 if (!token) {
                     // Mostrar mensaje en lugar de redirigir
                     showAlert('error', '{{ translations.login_required|default("Please log in to view your profile") }}');
-                    
+
                     // Deshabilitar formulario
                     const formElements = profileForm.elements;
                     for (let i = 0; i < formElements.length; i++) {
                         formElements[i].disabled = true;
                     }
-                    
+
                     // Añadir botón de login
                     const loginButton = document.createElement('a');
                     loginButton.href = '/login';
                     loginButton.className = 'btn btn-lg mt-3';
                     loginButton.style = 'background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600;';
                     loginButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>{{ translations.login|default("Log In") }}';
-                    
+
                     // Reemplazar botón de guardar con botón de login
                     saveProfileBtn.parentNode.appendChild(loginButton);
                     saveProfileBtn.style.display = 'none';
-                    
+
                     return;
                 }
-                
+
                 try {
                     // Obtener datos de usuario del localStorage
                     const userString = localStorage.getItem('user');
                     console.log('Datos de usuario encontrados:', userString ? 'Sí' : 'No');
-                    
+
                     if (!userString) {
                         console.error('No se encontraron datos de usuario en localStorage');
                         window.location.href = '/login';
                         return;
                     }
-                    
+
                     const userData = JSON.parse(userString);
                     console.log('Datos de usuario cargados:', userData);
-                    
+
                     if (userData) {
                         // Popular campos con datos del localStorage
                         document.getElementById('username').value = userData.username || '';
                         document.getElementById('email').value = userData.email || '';
                         document.getElementById('name').value = userData.name || '';
                         document.getElementById('surname').value = userData.surname || '';
-                        
+
                         // Si name y surname ya están en localStorage, no hay que cargarlos de nuevo
                         if (userData.name && userData.surname) {
                             console.log('Nombre y apellido encontrados en localStorage, no se requiere cargar de API');
                             return;
                         }
-                        
+
                         // Cargar datos adicionales de la API solo si es necesario
                         console.log('Solicitando datos adicionales de API...');
                         fetch('/api/user/profile', {
@@ -289,12 +287,12 @@
                         })
                         .then(function(data) {
                             console.log('Respuesta API de perfil:', data);
-                            
+
                             if (data.status === 'success' && data.data) {
                                 // Actualizar campos con datos de API
                                 if (!userData.name) document.getElementById('name').value = data.data.name || '';
                                 if (!userData.surname) document.getElementById('surname').value = data.data.surname || '';
-                                
+
                                 // Actualizar localStorage con datos completos
                                 const updatedUserData = {
                                     id: userData.id,
@@ -303,7 +301,7 @@
                                     name: data.data.name || userData.name || '',
                                     surname: data.data.surname || userData.surname || ''
                                 };
-                                
+
                                 console.log('Guardando datos actualizados en localStorage:', updatedUserData);
                                 localStorage.setItem('user', JSON.stringify(updatedUserData));
                             } else {
@@ -323,16 +321,16 @@
                     showAlert('error', 'Error procesando datos de usuario: ' + error.message);
                 }
             }
-            
+
             // Función para actualizar perfil de usuario
             function updateProfile() {
                 const token = localStorage.getItem('token');
-                
+
                 if (!token) {
                     window.location.href = '/login';
                     return;
                 }
-                
+
                 // Obtener datos del formulario
                 const name = document.getElementById('name').value;
                 const surname = document.getElementById('surname').value;
@@ -446,7 +444,7 @@
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 sessionStorage.clear();
-                
+
                 // Redireccionar a página de login
                 window.location.href = '/login';
             }

@@ -40,13 +40,13 @@
 
         <div id="loadingSpinner" class="text-center py-5">
             <div class="spinner-border text-primary" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">{{ translations.loading }}</span>
             </div>
-            <p class="text-white mt-3">Loading player data...</p>
+            <p class="text-white mt-3">{{ translations.loading_player_data }}</p>
         </div>
 
         <div id="errorMessage" class="alert alert-danger" style="display: none; background-color: rgba(26, 26, 46, 0.8); color: white; border: 2px solid #ff3535;">
-            Error loading player data. Please try again later.
+            {{ translations.error_data }}
         </div>
 
         <div id="playerContent" class="row" style="display: none;">
@@ -173,15 +173,15 @@
             const errorMessage = document.getElementById('errorMessage');
             const playerContent = document.getElementById('playerContent');
             let radarChart = null;
-            
+
             // Fetch player data from API
             fetchPlayerData(playerId);
-            
+
             function fetchPlayerData(id) {
                 loadingSpinner.style.display = 'block';
                 errorMessage.style.display = 'none';
                 playerContent.style.display = 'none';
-                
+
                 fetch(`/api/players/get/${id}`)
                     .then(response => {
                         if (!response.ok) {
@@ -206,7 +206,7 @@
                         loadingSpinner.style.display = 'none';
                     });
             }
-            
+
             function renderPlayerData(player) {
                 // Set player basic info
                 document.getElementById('playerImage').src = `/assets/img/${player.player_id}.jpg`;
@@ -214,7 +214,7 @@
                 document.getElementById('playerName').textContent = `${player.name} ${player.surname}`;
                 document.getElementById('playerBirthday').textContent = player.birthday;
                 document.getElementById('playerHeight').textContent = player.height;
-                
+
                 // Set team info if available
                 if (player.team) {
                     document.getElementById('playerTeam').textContent = player.team;
@@ -222,46 +222,46 @@
                 } else {
                     document.getElementById('playerTeamContainer').style.display = 'none';
                 }
-                
+
                 // Set stats
                 document.getElementById('playerDef').textContent = player.def;
                 document.getElementById('progressDef').style.width = `${player.def * 10}%`;
                 document.getElementById('progressDef').setAttribute('aria-valuenow', player.def);
-                
+
                 document.getElementById('playerSpd').textContent = player.spd;
                 document.getElementById('progressSpd').style.width = `${player.spd * 10}%`;
                 document.getElementById('progressSpd').setAttribute('aria-valuenow', player.spd);
-                
+
                 document.getElementById('playerOff').textContent = player.off;
                 document.getElementById('progressOff').style.width = `${player.off * 10}%`;
                 document.getElementById('progressOff').setAttribute('aria-valuenow', player.off);
-                
+
                 document.getElementById('playerPass').textContent = player.pass;
                 document.getElementById('progressPass').style.width = `${player.pass * 10}%`;
                 document.getElementById('progressPass').setAttribute('aria-valuenow', player.pass);
-                
+
                 document.getElementById('playerDrb').textContent = player.drb;
                 document.getElementById('progressDrb').style.width = `${player.drb * 10}%`;
                 document.getElementById('progressDrb').setAttribute('aria-valuenow', player.drb);
-                
+
                 document.getElementById('playerShoot').textContent = player.shoot;
                 document.getElementById('progressShoot').style.width = `${player.shoot * 10}%`;
                 document.getElementById('progressShoot').setAttribute('aria-valuenow', player.shoot);
-                
+
                 // Create radar chart
                 createRadarChart(player);
-                
+
                 // Show player content
                 playerContent.style.display = 'flex';
             }
-            
+
             function createRadarChart(player) {
                 const ctx = document.getElementById('statsRadarChart').getContext('2d');
-                
+
                 if (radarChart) {
                     radarChart.destroy();
                 }
-                
+
                 radarChart = new Chart(ctx, {
                     type: 'radar',
                     data: {
@@ -359,11 +359,11 @@
         transform: translateY(-3px);
         box-shadow: 0 5px 15px rgba(0, 0, 245, 0.2);
     }
-    
+
     .chart-container {
         animation: fadeIn 1s ease-in-out;
     }
-    
+
     @keyframes fadeIn {
         from { opacity: 0; transform: scale(0.9); }
         to { opacity: 1; transform: scale(1); }
