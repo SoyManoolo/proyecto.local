@@ -1,23 +1,26 @@
 <?php
 return [
-    // Login y Signup
+    // Login y Sign Up
     "login" => "Iniciar Sesión",
     "username" => "Usuario",
     "usernameemail" => "Usuario/Email",
     "password" => "Contraseña",
     "signup" => "Registrarse",
-    "email" => "Correo Electrónico",
+    "email" => "Correo",
     "logout" => "Cerrar Sesión",
     "orsignup" => "O Regístrate",
     "name" => "Nombre",
     "surname" => "Apellido",
     "orlogin" => "O Inicia Sesión",
     "profile" => "Perfil",
+    "home" => "Inicio",
+    "forgot_password" => "Olvidaste tu contraseña?",
+    "logout_confirmation" => "¿Estás seguro de que deseas cerrar sesión?",
 
     // Información del Jugador
     "players" => "Jugadores",
     "player" => "Jugador",
-    "birthday" => "Cumpleaños",
+    "birthday" => "Fecha de Nacimiento",
     "height" => "Altura",
     "team" => "Equipo",
     "image" => "Imagen",
@@ -28,7 +31,7 @@ return [
     "close" => "Cerrar",
     "back_to_players" => "Volver a Jugadores",
     "full_profile" => "Perfil Completo",
-    "stats_scale_info" => "Todas las estadísticas están valoradas en una escala del 1 al 10",
+    "stats_scale_info" => "Todas las estadísticas están calificadas en una escala del 1 al 10",
 
     // Estadísticas
     "defense" => "Defensa",
@@ -38,8 +41,46 @@ return [
     "dribbling" => "Regate",
     "shooting" => "Tiro",
 
-    // Errores y Mensajes
+    // Panel de Administración
+    "admin_panel" => "Panel de Administración",
+    "admin" => "Administrador",
+    "exit_admin" => "Salir del Admin",
+    "players_management" => "Gestión de Jugadores",
+    "add_player" => "Agregar Jugador",
+    "edit_player" => "Editar Jugador",
+    "delete_player" => "Eliminar Jugador",
+    "confirm_deletion" => "Confirmar Eliminación",
+    "delete_confirmation" => "¿Estás seguro de que deseas eliminar este jugador? Esta acción no se puede deshacer.",
+    "cancel" => "Cancelar",
+    "save_player" => "Guardar Jugador",
+    "loading" => "Cargando...",
+    "loading_players" => "Cargando jugadores...",
+    "no_players_found" => "No se encontraron jugadores.",
+    "player_id" => "ID",
+    "player_actions" => "Acciones",
+    "notification" => "Notificación",
+    "height_cm" => "Altura (cm)",
+    "players_list" => "Lista de Jugadores",
+    "delete" => "Eliminar",
+    "loading_player_data" => "Cargando datos del jugador...",
+
+    // Errors y Mensajes
+    "error" => "Error",
+    "success" => "Éxito",
     "no_players" => "No hay jugadores disponibles",
     "not_found" => "Página no encontrada",
     "error_occurred" => "Ha ocurrido un error",
+    "failed_to_load_players" => "Error al cargar jugadores",
+    "failed_to_connect_to_server" => "Error al conectar con el servidor",
+    "player_not_found" => "Jugador no encontrado",
+    "please_fill_all_required_fields" => "Por favor complete todos los campos requeridos",
+    "player_added_successfully" => "Jugador agregado exitosamente",
+    "player_updated_successfully" => "Jugador actualizado exitosamente",
+    "failed_to_save_player" => "Error al guardar el jugador",
+    "player_id_not_found" => "ID de jugador no encontrado",
+    "player_deleted_successfully" => "Jugador eliminado exitosamente",
+    "failed_to_delete_player" => "Error al eliminar el jugador",
+    "page_not_found" => "La página que está buscando no existe",
+    "back_to_home" => "Volver al inicio",
+    "error_data" => "Error al cargar datos del jugador. Por favor, inténtelo de nuevo más tarde.",
 ];
