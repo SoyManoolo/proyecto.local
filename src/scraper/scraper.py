@@ -9,15 +9,6 @@ import os
 import requests
 
 """
-Módulo Scraper para Blue Lock
-
-Este módulo contiene funcionalidades para:
-1. Obtener estadísticas de jugadores de Blue Lock mediante web scraping
-2. Descargar y almacenar imágenes de los personajes
-3. Almacenar datos en la base de datos del sistema
-"""
-
-"""
 Lista de personajes con sus metadatos básicos
 
 Cada entrada contiene:
@@ -182,61 +173,6 @@ personajes = [
         "url": "https://bluelock.fandom.com/wiki/Charles_Chevalier"
     }
 ]
-
-
-def scraperStats():
-    """
-    Obtiene las estadísticas de los jugadores desde la web de Blue Lock
-
-    Utiliza Selenium para:
-    - Automatizar la navegación en el sitio web
-    - Extraer valores numéricos de las estadísticas
-    - Almacenar los datos en la base de datos mediante DatabaseController
-
-    Returns:
-        list: Lista de diccionarios con las estadísticas de cada jugador
-
-    Raises:
-        WebDriverException: Si hay problemas con el navegador o la conexión
-        DatabaseError: Si falla la inserción en la base de datos
-    """
-    driver = webdriver.Chrome()
-    driver.get("https://blue-lock-marcelones.vercel.app/")
-
-    wait = WebDriverWait(driver, 3)
-    buttons = driver.find_elements(By.CSS_SELECTOR, "button.select-none")
-
-    # Conectar a la base de datos
-    db_controller = DatabaseController()
-    stats_data = []
-
-    for player_id, button in enumerate(buttons, start=1):
-        button.click()
-
-        # Esperar que aparezcan las estadísticas
-        wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, ".flex.w-\\[70px\\].justify-center.items-center.bg-color1.mx-1.font-roboto.text-white.font-bold")))
-
-        # Extraer estadísticas del jugador
-        stats = driver.find_elements(By.CSS_SELECTOR, ".flex.w-\\[70px\\].justify-center.items-center.bg-color1.mx-1.font-roboto.text-white.font-bold")
-        stat_values = [int(stat.text) for stat in stats]
-
-        # Agregar los datos a la lista
-        stats_data.append({
-            "player_id": player_id,
-            "def": stat_values[0],
-            "spd": stat_values[1],
-            "off": stat_values[2],
-            "pass": stat_values[3],
-            "drb": stat_values[4],
-            "shoot": stat_values[5]
-        })
-
-    driver.quit()
-
-    # Insertar datos en MySQL después del scraping
-    # db_controller.insert_stats(stats_data)
-    # db_controller.close_connection()
-    print(stats_data)
 
 # Ruta de imágenes
 IMAGE_FOLDER = "public/assets/img/"

@@ -1,20 +1,11 @@
 <?php
-/**
- * Controlador de Jugadores
- *
- * Este controlador maneja todas las operaciones relacionadas con los jugadores,
- * incluyendo la obtención de jugadores individuales y listas de jugadores.
- * También procesa las solicitudes API relacionadas con los jugadores.
- */
 
 require_once __DIR__ . '/../controller/DatabaseController.php';
 
+// Controlador para manejar las solicitudes relacionadas con los jugadores
 class PlayerController {
-    /**
-     * Obtiene todos los jugadores de la base de datos
-     *
-     * @return array Respuesta JSON con los datos de los jugadores
-     */
+
+    // Obtiene todos los jugadores con sus estadísticas
     public static function getAllPlayers() {
         $db = DatabaseController::connect();
 
@@ -36,6 +27,7 @@ class PlayerController {
             JOIN Stats s ON p.player_id = s.player_id;
         ");
 
+        // Obtiene los resultados de la consulta
         $players = $query->fetchAll(PDO::FETCH_ASSOC);
 
         return [
@@ -45,12 +37,7 @@ class PlayerController {
         ];
     }
 
-    /**
-     * Obtiene un jugador por su ID
-     *
-     * @param int $id ID del jugador
-     * @return array Respuesta JSON con los datos del jugador
-     */
+    // Obtiene un jugador específico por su ID
     public static function getPlayerById($id) {
         $db = DatabaseController::connect();
 
@@ -73,9 +60,11 @@ class PlayerController {
             WHERE p.player_id = :id
         ");
 
+        // Ejecuta la consulta con el ID del jugador como parámetro
         $stmt->bindParam(':id', $id, PDO::PARAM_INT);
         $stmt->execute();
 
+        // Obtiene los resultados de la consulta
         $player = $stmt->fetch(PDO::FETCH_ASSOC);
 
         // Devuelve los datos del jugador si se encuentra, o un mensaje de error si no
@@ -92,15 +81,7 @@ class PlayerController {
         }
     }
 
-    /**
-     * Procesa las solicitudes API para los endpoints de jugadores
-     *
-     * @param string $method Método HTTP
-     * @param string $action Acción a realizar
-     * @param mixed $id ID del jugador (si aplica)
-     * @param array $data Datos de la solicitud (si aplica)
-     * @return array Datos de respuesta
-     */
+    // Procesa las solicitudes de la API relacionadas con los jugadores
     public static function processApiRequest($method, $action, $id = null, $data = null) {
         switch ($method) {
             case 'GET':

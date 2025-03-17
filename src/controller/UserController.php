@@ -1,132 +1,84 @@
 <?php
-/**
- * Controlador de Usuarios
- *
- * Este controlador maneja todas las operaciones relacionadas con los usuarios,
- * incluyendo registro, inicio de sesión, actualización de perfil y verificación de roles.
- * También se encarga de la generación y validación de tokens JWT para la autenticación.
- */
+//Controlador para manejar las solicitudes relacionadas con los usuarios
 require_once __DIR__ . "../DatabaseController.php";
 
+// Importar la clase JWT de Firebase
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
 class UserController
 {
-    /**
-     * Clave secreta para firmar los tokens JWT
-     * @var string
-     */
-    public static $secretKey = "claveSecreta"; //Clave secreta para firmar el token
+    // Clave secreta para firmar tokens JWT
+    public static $secretKey = "claveSecreta";
+    private $connection;
 
-    /**
-     * Conexión a la base de datos
-     * @var PDO
-     */
-    private $connection; //Conexión a la base de datos
-
-    /**
-     * Constructor que inicializa la conexión a la base de datos
-     */
+    // Constructor para inicializar la conexión a la base de datos
     public function __construct()
-    { //Constructor de la clase
-        $this->connection = DatabaseController::connect(); //Obtiene la conexión a la base de datos
+    {
+        $this->connection = DatabaseController::connect();
     }
 
-    /**
-     * Registra un nuevo usuario en el sistema
-     *
-     * @param string $username Nombre de usuario
-     * @param string $email Correo electrónico
-     * @param string $name Nombre
-     * @param string $surname Apellido
-     * @param string $password Contraseña
-     * @return array Respuesta con estado y mensaje
-     */
+    // Función para registrar un nuevo usuario
     public static function signUp($username, $email, $name, $surname, $password)
-    { //Función para registrar un usuario
-        if ((new self)->exist($email)) { //Verifica si el usuario ya existe
+    {
+        // Verificar si el usuario ya existe
+        if ((new self)->exist($email)) {
+            return ['status' => 'error', 'message' => 'Account already exists'];
+        }
+
+        try {
+            // Hash de la contraseña antes de guardarla en la base de datos
+            $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+            // Preparar la consulta SQL para insertar un nuevo usuario
+            $stmt = (new self)->connection->prepare("INSERT into Users (username, email, name, surname, password) VALUES (:username, :email, :name, :surname, :password)");
+            $stmt->bindValue(':username', $username);
+            $stmt->bindValue(':email', $email);
+            $stmt->bindValue(':name', $name);
+            $stmt->bindValue(':surname', $surname);
+            $stmt->bindValue(':password', $hashedPassword);
+            $stmt->execute();
+
+            // Devolvemos token para permitir login automático tras registro
+            $userId = (new self)->connection->lastInsertId();
+            $token = self::generateToken($userId, $username, $email);
+
             return [
-                'status' => 'error',
-                'message' => 'Account already exists'
+                'status' => 'success',
+                'message' => 'User registered successfully',
+                'token' => $token,
+                'user' => [
+                    'id' => $userId,
+                    'username' => $username,
+                    'email' => $email,
+                    'name' => $name,
+                    'surname' => $surname
+                ]
             ];
-        } else {
-            try {
-                $sql = "INSERT into Users (username, email, name, surname, password) VALUES (:username, :email, :name, :surname, :password)"; //Consulta SQL
-
-                $hashedPassword = password_hash($password, PASSWORD_DEFAULT); //Encripta la contraseña
-
-                $stmt = (new self)->connection->prepare($sql); //Prepara la consulta
-                $stmt->bindValue(':username', $username); //Asigna los valores a los parámetros
-                $stmt->bindValue(':email', $email);
-                $stmt->bindValue(':name', $name);
-                $stmt->bindValue(':surname', $surname);
-                $stmt->bindValue(':password', $hashedPassword);
-                $stmt->setFetchMode(PDO::FETCH_OBJ); //Establece el modo de recuperación de datos
-                $stmt->execute(); //Ejecuta la consulta
-
-                return [
-                    'status' => 'success',
-                    'message' => 'User registered successfully'
-                ];
-            } catch (PDOException $error) {
-                return [
-                    'status' => 'error',
-                    'message' => 'Database error: ' . $error->getMessage()
-                ];
-            }
+        } catch (PDOException $error) {
+            return ['status' => 'error', 'message' => 'Database error: ' . $error->getMessage()];
         }
     }
 
-    /**
-     * Inicia sesión de un usuario verificando sus credenciales
-     *
-     * @param string $emailUsername Correo electrónico o nombre de usuario
-     * @param string $password Contraseña
-     * @return array Respuesta con estado, mensaje y token si es exitoso
-     */
     public static function signIn($emailUsername, $password)
     {
-        $db = (new self())->connection;
-
         try {
-            // Buscar al usuario por email o nombre de usuario
-            $sql = "SELECT id, username, email, password, name, surname FROM Users WHERE email = :email OR username = :username";
-            $stmt = $db->prepare($sql);
+            $db = (new self())->connection;
+            $stmt = $db->prepare("SELECT id, username, email, password, name, surname FROM Users WHERE email = :email OR username = :username");
             $stmt->bindValue(':email', $emailUsername);
             $stmt->bindValue(':username', $emailUsername);
             $stmt->execute();
 
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            // Si el usuario no existe, devolver mensaje de error
             if (!$user) {
-                return [
-                    'status' => 'error',
-                    'message' => 'Account does not exist.'
-                ];
+                return ['status' => 'error', 'message' => 'Account does not exist.'];
             }
 
-            // Comparar la contraseña ingresada con el hash almacenado
             if (!password_verify($password, $user['password'])) {
-                return [
-                    'status' => 'error',
-                    'message' => 'Incorrect password.'
-                ];
+                return ['status' => 'error', 'message' => 'Incorrect password.'];
             }
 
-            // Generar token JWT para mantener la sesión
             $token = self::generateToken($user['id'], $user['username'], $user['email']);
-
-            // Registrar el inicio de sesión en el log
-            error_log('User logged in: ' . $user['username'] . ' (ID: ' . $user['id'] . ')');
-            error_log('User data: ' . json_encode([
-                'id' => $user['id'],
-                'username' => $user['username'],
-                'email' => $user['email'],
-                'name' => $user['name'],
-                'surname' => $user['surname']
-            ]));
 
             return [
                 'status' => 'success',
@@ -141,67 +93,27 @@ class UserController
                 ]
             ];
         } catch (PDOException $error) {
-            return [
-                'status' => 'error',
-                'message' => 'Database error: ' . $error->getMessage()
-            ];
+            return ['status' => 'error', 'message' => 'Database error: ' . $error->getMessage()];
         }
     }
 
-    /**
-     * Verifica si un usuario ya existe en la base de datos
-     *
-     * @param string $emailUsername Correo electrónico o nombre de usuario
-     * @return bool True si el usuario existe, false en caso contrario
-     */
     public static function exist($emailUsername): bool
-    { //Función para verificar si un usuario ya existe
-        if (str_contains($emailUsername, "@")) { //Verifica si el parámetro es un email
-            try {
-                $sql = "SELECT * FROM users WHERE email = :email"; //Consulta SQL
+    {
+        $isEmail = str_contains($emailUsername, "@");
+        $field = $isEmail ? 'email' : 'username';
 
-                $stmt = (new self)->connection->prepare($sql);
-                $stmt->bindValue(':email', $emailUsername);
-                $stmt->setFetchMode(PDO::FETCH_OBJ);
-                $stmt->execute();
-
-                $result = $stmt->fetch(); //Obtiene el resultado de la consulta
-
-                return (bool) $result; //Retorna si el resultado es verdadero o falso
-
-            } catch (PDOException $error) { //Manejo de errores
-                echo $sql . "<br>" . $error->getMessage();
-                return false;
-            }
-        } else { //Si no es un email, entonces es un nombre de usuario
-            try {
-                $sql = "SELECT * FROM users WHERE username = :username"; //Consulta SQL
-
-                $stmt = (new self)->connection->prepare($sql);
-                $stmt->bindValue(':username', $emailUsername);
-                $stmt->setFetchMode(PDO::FETCH_OBJ);
-                $stmt->execute();
-
-                $result = $stmt->fetch();
-
-                return (bool) $result;
-            } catch (PDOException $error) {
-                echo $sql . "<br>" . $error->getMessage();
-                return false;
-            }
+        try {
+            $stmt = (new self)->connection->prepare("SELECT * FROM users WHERE $field = :value");
+            $stmt->bindValue(':value', $emailUsername);
+            $stmt->execute();
+            return (bool) $stmt->fetch();
+        } catch (PDOException $error) {
+            return false;
         }
     }
 
-    /**
-     * Genera un token JWT para la autenticación del usuario
-     *
-     * @param int $id ID del usuario
-     * @param string $username Nombre de usuario
-     * @param string $email Correo electrónico
-     * @return string Token JWT generado
-     */
     public static function generateToken($id, $username, $email)
-    { //Función para generar un token JWT
+    {
         $payload = [
             'id' => $id,
             'username' => $username,
@@ -210,346 +122,129 @@ class UserController
             'exp' => time() + 3600
         ];
 
-        $jwt = JWT::encode($payload, self::$secretKey, 'HS256'); //Firma el token
-        return $jwt;
+        return JWT::encode($payload, self::$secretKey, 'HS256');
     }
 
-    /**
-     * Procesa las solicitudes API para los endpoints de usuario
-     *
-     * @param string $method Método HTTP
-     * @param string $action Acción a realizar
-     * @param array $data Datos de la solicitud
-     * @return array Datos de respuesta
-     */
-    public static function processApiRequest($method, $action, $data = null) {
-        switch ($method) {
-            case 'POST':
-                if ($action === 'login') {
-                    // Aceptar tanto datos JSON como datos de formulario
-                    $emailUsername = $data['user'] ?? '';
-                    $password = $data['password'] ?? '';
+    public static function processApiRequest($method, $action, $data = null)
+    {
+        header('Content-Type: application/json');
 
-                    return self::signIn($emailUsername, $password);
-                } elseif ($action === 'register') {
-                    $name = $data['name'] ?? '';
-                    $surname = $data['surname'] ?? '';
-                    $username = $data['user'] ?? '';
-                    $email = $data['email'] ?? '';
-                    $password = $data['password'] ?? '';
-
-                    return self::signUp($username, $email, $name, $surname, $password);
-                } elseif ($action === 'update') {
-                    // Get token from Authorization header
-                    $token = self::getTokenFromRequest();
-
-                    if (!$token) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Authorization token required'
-                        ];
-                    }
-
-                    // Validate token and get user ID
-                    try {
-                        // Attempt to decode the token
-                        $key = new Key(self::$secretKey, 'HS256');
-                        $decoded = JWT::decode($token, $key);
-
-                        $userId = $decoded->id;
-
-                        // Update user profile
-                        return self::updateUserProfile($userId, $data);
-                    } catch (Exception $e) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Invalid token: ' . $e->getMessage()
-                        ];
-                    }
-                } elseif ($action === 'isAdmin') {
-                    // Get token from Authorization header
-                    $token = self::getTokenFromRequest();
-
-                    if (!$token) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Authorization token required'
-                        ];
-                    }
-
-                    // Validate token and get user ID
-                    try {
-                        // Attempt to decode the token
-                        $key = new Key(self::$secretKey, 'HS256');
-                        $decoded = JWT::decode($token, $key);
-
-                        $userId = $decoded->id;
-
-                        // Check if user is admin
-                        return self::isAdmin($userId);
-                    } catch (Exception $e) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Invalid token: ' . $e->getMessage()
-                        ];
-                    }
-                }
-                break;
-
-            case 'GET':
-                if ($action === 'profile') {
-                    // Get token from Authorization header
-                    $token = self::getTokenFromRequest();
-
-                    if (!$token) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Authorization token required'
-                        ];
-                    }
-
-                    // Validate token and get user data
-                    try {
-                        // Attempt to decode the token
-                        $key = new Key(self::$secretKey, 'HS256');
-                        $decoded = JWT::decode($token, $key);
-
-                        $userId = $decoded->id;
-
-                        // Get user profile data
-                        return self::getUserProfile($userId);
-                    } catch (Exception $e) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Invalid token: ' . $e->getMessage()
-                        ];
-                    }
-                } elseif ($action === 'check-admin') {
-                    // Get token from Authorization header
-                    $token = self::getTokenFromRequest();
-
-                    if (!$token) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Authorization token required'
-                        ];
-                    }
-
-                    // Validate token and get user ID
-                    try {
-                        // Attempt to decode the token
-                        $key = new Key(self::$secretKey, 'HS256');
-                        $decoded = JWT::decode($token, $key);
-
-                        $userId = $decoded->id;
-
-                        // Check if user is admin
-                        $result = self::isAdmin($userId);
-
-                        if ($result['status'] === 'success') {
-                            return [
-                                'status' => 'success',
-                                'isAdmin' => true
-                            ];
-                        } else {
-                            return [
-                                'status' => 'success',
-                                'isAdmin' => false
-                            ];
-                        }
-                    } catch (Exception $e) {
-                        return [
-                            'status' => 'error',
-                            'message' => 'Invalid token: ' . $e->getMessage()
-                        ];
-                    }
-                }
-                break;
-
-            default:
-                return [
-                    'status' => 'error',
-                    'message' => 'Method not allowed'
-                ];
+        if ($method === 'POST') {
+            if ($action === 'login') {
+                return self::signIn($data['user'] ?? '', $data['password'] ?? '');
+            } elseif ($action === 'register') {
+                return self::signUp(
+                    $data['user'] ?? '',
+                    $data['email'] ?? '',
+                    $data['name'] ?? '',
+                    $data['surname'] ?? '',
+                    $data['password'] ?? ''
+                );
+            } elseif (in_array($action, ['update', 'isAdmin'])) {
+                return self::processAuthenticatedRequest($action, $data);
+            }
+        } elseif ($method === 'GET' && in_array($action, ['profile', 'check-admin'])) {
+            return self::processAuthenticatedRequest($action, $data);
+        } elseif ($method === 'OPTIONS') {
+            return ['status' => 'success', 'message' => 'CORS preflight request successful'];
         }
 
-        return [
-            'status' => 'error',
-            'message' => 'Invalid action'
-        ];
+        return ['status' => 'error', 'message' => 'Invalid action or method'];
     }
 
-    /**
-     * Obtiene los datos del perfil de un usuario
-     *
-     * @param int $userId ID del usuario
-     * @return array Respuesta con estado, mensaje y datos del usuario
-     */
-    private static function getUserProfile($userId) {
+    private static function processAuthenticatedRequest($action, $data = null)
+    {
+        $token = self::getTokenFromRequest();
+        if (!$token) {
+            return ['status' => 'error', 'message' => 'Authorization token required'];
+        }
+
         try {
-            $sql = "SELECT id, username, email, name, surname FROM Users WHERE id = :id";
-            $stmt = (new self)->connection->prepare($sql);
+            $decoded = JWT::decode($token, new Key(self::$secretKey, 'HS256'));
+            $userId = $decoded->id;
+
+            switch ($action) {
+                case 'update':
+                    return self::updateUserProfile($userId, $data);
+
+                case 'profile':
+                    return self::getUserProfile($userId);
+            }
+        } catch (Exception $e) {
+            return ['status' => 'error', 'message' => 'Invalid token: ' . $e->getMessage()];
+        }
+
+        return ['status' => 'error', 'message' => 'Unknown action'];
+    }
+
+    private static function getUserProfile($userId)
+    {
+        try {
+            $stmt = (new self)->connection->prepare("SELECT id, username, email, name, surname FROM Users WHERE id = :id");
             $stmt->bindValue(':id', $userId);
             $stmt->execute();
-
             $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            if (!$user) {
-                return [
-                    'status' => 'error',
-                    'message' => 'User not found'
-                ];
-            }
-
-            return [
-                'status' => 'success',
-                'message' => 'Profile data retrieved successfully',
-                'data' => $user
-            ];
+            return $user ?
+                ['status' => 'success', 'message' => 'Profile data retrieved successfully', 'data' => $user] :
+                ['status' => 'error', 'message' => 'User not found'];
         } catch (PDOException $error) {
-            return [
-                'status' => 'error',
-                'message' => 'Database error: ' . $error->getMessage()
-            ];
+            return ['status' => 'error', 'message' => 'Database error: ' . $error->getMessage()];
         }
     }
 
-    /**
-     * Actualiza los datos del perfil de un usuario
-     *
-     * @param int $userId ID del usuario
-     * @param array $data Datos del usuario a actualizar
-     * @return array Respuesta con estado y mensaje
-     */
-    private static function updateUserProfile($userId, $data) {
+    private static function updateUserProfile($userId, $data)
+    {
         try {
-            // Check if password change is requested
+            $db = (new self)->connection;
+
             if (!empty($data['currentPassword']) && !empty($data['newPassword'])) {
                 // Verify current password
-                $sql = "SELECT password FROM Users WHERE id = :id";
-                $stmt = (new self)->connection->prepare($sql);
+                $stmt = $db->prepare("SELECT password FROM Users WHERE id = :id");
                 $stmt->bindValue(':id', $userId);
                 $stmt->execute();
-
                 $user = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 if (!$user || !password_verify($data['currentPassword'], $user['password'])) {
-                    return [
-                        'status' => 'error',
-                        'message' => 'Current password is incorrect'
-                    ];
+                    return ['status' => 'error', 'message' => 'Current password is incorrect'];
                 }
 
-                // Update user data with new password
-                $sql = "UPDATE Users SET name = :name, surname = :surname, password = :password WHERE id = :id";
-                $stmt = (new self)->connection->prepare($sql);
-                $stmt->bindValue(':name', $data['name']);
-                $stmt->bindValue(':surname', $data['surname']);
+                // Update with new password
+                $stmt = $db->prepare("UPDATE Users SET name = :name, surname = :surname, password = :password WHERE id = :id");
                 $stmt->bindValue(':password', password_hash($data['newPassword'], PASSWORD_DEFAULT));
-                $stmt->bindValue(':id', $userId);
-                $stmt->execute();
             } else {
-                // Update user data without changing password
-                $sql = "UPDATE Users SET name = :name, surname = :surname WHERE id = :id";
-                $stmt = (new self)->connection->prepare($sql);
-                $stmt->bindValue(':name', $data['name']);
-                $stmt->bindValue(':surname', $data['surname']);
-                $stmt->bindValue(':id', $userId);
-                $stmt->execute();
+                // Update without changing password
+                $stmt = $db->prepare("UPDATE Users SET name = :name, surname = :surname WHERE id = :id");
             }
+
+            $stmt->bindValue(':name', $data['name']);
+            $stmt->bindValue(':surname', $data['surname']);
+            $stmt->bindValue(':id', $userId);
+            $stmt->execute();
 
             // Get updated user data
-            $sql = "SELECT id, username, email FROM Users WHERE id = :id";
-            $stmt = (new self)->connection->prepare($sql);
+            $stmt = $db->prepare("SELECT id, username, email FROM Users WHERE id = :id");
             $stmt->bindValue(':id', $userId);
             $stmt->execute();
-
             $updatedUser = $stmt->fetch(PDO::FETCH_ASSOC);
 
-            return [
-                'status' => 'success',
-                'message' => 'Profile updated successfully',
-                'user' => $updatedUser
-            ];
+            return ['status' => 'success', 'message' => 'Profile updated successfully', 'user' => $updatedUser];
         } catch (PDOException $error) {
-            return [
-                'status' => 'error',
-                'message' => 'Database error: ' . $error->getMessage()
-            ];
+            return ['status' => 'error', 'message' => 'Database error: ' . $error->getMessage()];
         }
     }
 
-    /**
-     * Verifica si un usuario tiene rol de administrador
-     *
-     * @param int $userId ID del usuario
-     * @return array Respuesta con estado y mensaje
-     */
-    private static function isAdmin($userId) {
-        try {
-            $sql = "SELECT role FROM Users WHERE id = :id";
-            $stmt = (new self)->connection->prepare($sql);
-            $stmt->bindValue(':id', $userId);
-            $stmt->execute();
-
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-            if (!$user) {
-                return [
-                    'status' => 'error',
-                    'message' => 'User not found'
-                ];
-            }
-
-            if ($user['role'] === 'admin') {
-                return [
-                    'status' => 'success',
-                    'message' => 'User is admin'
-                ];
-            } else {
-                return [
-                    'status' => 'error',
-                    'message' => 'User is not admin'
-                ];
-            }
-        } catch (PDOException $error) {
-            return [
-                'status' => 'error',
-                'message' => 'Database error: ' . $error->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Extrae el token JWT de los encabezados de la solicitud
-     *
-     * @return string|null Token o null si no se encuentra
-     */
-    private static function getTokenFromRequest() {
-        // Try to get headers using getallheaders() if available
+    private static function getTokenFromRequest()
+    {
+        // Try with getallheaders() if available
         if (function_exists('getallheaders')) {
             $headers = getallheaders();
-            $authHeader = isset($headers['Authorization']) ? $headers['Authorization'] : 
-                         (isset($headers['authorization']) ? $headers['authorization'] : '');
+            $authHeader = $headers['Authorization'] ?? $headers['authorization'] ?? '';
         } else {
-            // Fallback for servers without getallheaders()
-            $authHeader = '';
-
-            // Try to get the Authorization header from $_SERVER
-            if (isset($_SERVER['HTTP_AUTHORIZATION'])) {
-                $authHeader = $_SERVER['HTTP_AUTHORIZATION'];
-            } elseif (isset($_SERVER['REDIRECT_HTTP_AUTHORIZATION'])) {
-                $authHeader = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
-            } elseif (isset($_SERVER['HTTP_X_AUTHORIZATION'])) {
-                $authHeader = $_SERVER['HTTP_X_AUTHORIZATION'];
-            }
+            // Fallback method
+            $authHeader = $_SERVER['HTTP_AUTHORIZATION'] ?? $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ?? $_SERVER['HTTP_X_AUTHORIZATION'] ?? '';
         }
 
-        // Extract token from header
-        if (!empty($authHeader) && preg_match('/Bearer\s(\S+)/', $authHeader, $matches)) {
-            return $matches[1];
-        }
-
-        return null;
+        return preg_match('/Bearer\s(\S+)/', $authHeader, $matches) ? $matches[1] : null;
     }
 }

@@ -53,18 +53,6 @@
 
 {% block scripts %}
     <script>
-    /**
-     * Script para la funcionalidad de inicio de sesión
-     *
-     * Este script maneja el proceso de autenticación de usuarios, incluyendo:
-     * - Envío del formulario de login mediante AJAX
-     * - Procesamiento de la respuesta del servidor
-     * - Almacenamiento de datos de sesión en localStorage
-     * - Redirección tras inicio de sesión exitoso
-     * - Manejo de errores y visualización de alertas
-     */
-    console.log("El script de login.js se está ejecutando");
-
     document.addEventListener('DOMContentLoaded', function () {
         // Obtener referencias a los elementos del DOM
         const loginForm = document.getElementById('loginForm');
@@ -77,10 +65,8 @@
             return;
         }
 
-        /**
-         * Manejador del evento submit del formulario de login
-         * Realiza una petición AJAX al endpoint de login
-         */
+        // Manejador del evento submit del formulario de login
+        // Realiza una petición AJAX al endpoint de login
         loginForm.addEventListener('submit', function (e) {
             e.preventDefault();
 
@@ -165,12 +151,7 @@
             });
         });
 
-        /**
-         * Muestra una alerta con un mensaje específico
-         *
-         * @param {string} type - Tipo de alerta ('success' o 'error')
-         * @param {string} message - Mensaje a mostrar
-         */
+        // Muestra una alerta con un mensaje específico
         function showAlert(type, message) {
             loginAlert.classList.remove('d-none', 'alert-success', 'alert-danger');
             loginAlert.classList.add(type === 'success' ? 'alert-success' : 'alert-danger');

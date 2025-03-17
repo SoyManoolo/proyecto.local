@@ -150,182 +150,116 @@
 
 {% block scripts %}
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Obtener referencias a elementos del DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            // Obtener elementos del DOM
             const profileForm = document.getElementById('profileForm');
             const profileAlert = document.getElementById('profileAlert');
             const saveProfileBtn = document.getElementById('saveProfileBtn');
             const logoutBtn = document.querySelector('.logout-btn');
             const confirmLogoutBtn = document.getElementById('confirmLogout');
-            const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+            
+            // Salir si los elementos esenciales no existen
+            if (!profileForm || !profileAlert || !saveProfileBtn) return;
 
-            // Comprobar que los elementos existen
-            if (!profileForm || !profileAlert || !saveProfileBtn) {
-                console.error('No se encontraron elementos necesarios del formulario');
-                return;
-            }
-
-            // Inicializar botones de toggle password
-            togglePasswordBtns.forEach(function(btn) {
+            // Configurar botones de alternar visibilidad de contraseña
+            document.querySelectorAll('.toggle-password').forEach(btn => {
                 btn.addEventListener('click', function() {
-                    const targetId = this.getAttribute('data-target');
-                    const passwordInput = document.getElementById(targetId);
+                    const passwordInput = document.getElementById(this.getAttribute('data-target'));
                     const icon = this.querySelector('i');
-
                     if (passwordInput.type === 'password') {
                         passwordInput.type = 'text';
-                        icon.classList.remove('bi-eye');
-                        icon.classList.add('bi-eye-slash');
+                        icon.classList.replace('bi-eye', 'bi-eye-slash');
                     } else {
                         passwordInput.type = 'password';
-                        icon.classList.remove('bi-eye-slash');
-                        icon.classList.add('bi-eye');
+                        icon.classList.replace('bi-eye-slash', 'bi-eye');
                     }
                 });
             });
 
-            // Cargar datos del perfil
+            // Inicialización
             loadUserProfile();
+            profileForm.addEventListener('submit', e => { e.preventDefault(); updateProfile(); });
+            if (logoutBtn) logoutBtn.addEventListener('click', e => {
+                e.preventDefault();
+                new bootstrap.Modal(document.getElementById('logoutModal')).show();
+            });
+            if (confirmLogoutBtn) confirmLogoutBtn.addEventListener('click', logout);
 
-            // Manejar envío del formulario
-            if (profileForm) {
-                profileForm.addEventListener('submit', function(e) {
-                    e.preventDefault();
-                    updateProfile();
-                });
-            }
-
-            // Manejar clic en botón de logout
-            if (logoutBtn) {
-                logoutBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const logoutModal = new bootstrap.Modal(document.getElementById('logoutModal'));
-                    logoutModal.show();
-                });
-            }
-
-            // Manejar clic en botón de confirmar logout
-            if (confirmLogoutBtn) {
-                confirmLogoutBtn.addEventListener('click', function() {
-                    logout();
-                });
-            }
-
-            // Función para cargar datos del perfil de usuario
+            // Cargar perfil del usuario
             function loadUserProfile() {
-                console.log('Cargando perfil de usuario...');
-
-                // Obtener token del localStorage
                 const token = localStorage.getItem('token');
-                console.log('Token encontrado:', token ? 'Sí' : 'No');
-
+                
                 if (!token) {
-                    // Mostrar mensaje en lugar de redirigir
                     showAlert('error', '{{ translations.login_required|default("Please log in to view your profile") }}');
-
-                    // Deshabilitar formulario
-                    const formElements = profileForm.elements;
-                    for (let i = 0; i < formElements.length; i++) {
-                        formElements[i].disabled = true;
-                    }
-
-                    // Añadir botón de login
+                    // Deshabilitar formulario y mostrar botón de inicio de sesión
+                    Array.from(profileForm.elements).forEach(el => el.disabled = true);
                     const loginButton = document.createElement('a');
                     loginButton.href = '/login';
                     loginButton.className = 'btn btn-lg mt-3';
                     loginButton.style = 'background-color: #0000F5; color: white; border: none; border-radius: 8px; font-weight: 600;';
                     loginButton.innerHTML = '<i class="bi bi-box-arrow-in-right me-2"></i>{{ translations.login|default("Log In") }}';
-
-                    // Reemplazar botón de guardar con botón de login
                     saveProfileBtn.parentNode.appendChild(loginButton);
                     saveProfileBtn.style.display = 'none';
-
                     return;
                 }
 
                 try {
-                    // Obtener datos de usuario del localStorage
                     const userString = localStorage.getItem('user');
-                    console.log('Datos de usuario encontrados:', userString ? 'Sí' : 'No');
-
                     if (!userString) {
-                        console.error('No se encontraron datos de usuario en localStorage');
                         window.location.href = '/login';
                         return;
                     }
 
                     const userData = JSON.parse(userString);
-                    console.log('Datos de usuario cargados:', userData);
-
-                    if (userData) {
-                        // Popular campos con datos del localStorage
-                        document.getElementById('username').value = userData.username || '';
-                        document.getElementById('email').value = userData.email || '';
-                        document.getElementById('name').value = userData.name || '';
-                        document.getElementById('surname').value = userData.surname || '';
-
-                        // Si name y surname ya están en localStorage, no hay que cargarlos de nuevo
-                        if (userData.name && userData.surname) {
-                            console.log('Nombre y apellido encontrados en localStorage, no se requiere cargar de API');
-                            return;
-                        }
-
-                        // Cargar datos adicionales de la API solo si es necesario
-                        console.log('Solicitando datos adicionales de API...');
-                        fetch('/api/user/profile', {
-                            method: 'GET',
-                            headers: {
-                                'Authorization': 'Bearer ' + token,
-                                'Content-Type': 'application/json'
-                            }
-                        })
-                        .then(function(response) {
-                            if (!response.ok) {
-                                throw new Error('Error en respuesta de red');
-                            }
-                            return response.json();
-                        })
-                        .then(function(data) {
-                            console.log('Respuesta API de perfil:', data);
-
-                            if (data.status === 'success' && data.data) {
-                                // Actualizar campos con datos de API
-                                if (!userData.name) document.getElementById('name').value = data.data.name || '';
-                                if (!userData.surname) document.getElementById('surname').value = data.data.surname || '';
-
-                                // Actualizar localStorage con datos completos
-                                const updatedUserData = {
-                                    id: userData.id,
-                                    username: userData.username,
-                                    email: userData.email,
-                                    name: data.data.name || userData.name || '',
-                                    surname: data.data.surname || userData.surname || ''
-                                };
-
-                                console.log('Guardando datos actualizados en localStorage:', updatedUserData);
-                                localStorage.setItem('user', JSON.stringify(updatedUserData));
-                            } else {
-                                showAlert('error', data.message || 'Error cargando datos de perfil');
-                            }
-                        })
-                        .catch(function(error) {
-                            console.error('Error obteniendo datos de perfil:', error);
-                            showAlert('error', 'Error cargando datos de perfil. Por favor intente más tarde.');
-                        });
-                    } else {
-                        console.error('userData es nulo o indefinido');
+                    if (!userData) {
                         window.location.href = '/login';
+                        return;
                     }
+
+                    // Rellenar campos con datos del usuario
+                    document.getElementById('username').value = userData.username || '';
+                    document.getElementById('email').value = userData.email || '';
+                    document.getElementById('name').value = userData.name || '';
+                    document.getElementById('surname').value = userData.surname || '';
+
+                    // Omitir llamada a la API si los datos ya están en localStorage
+                    if (userData.name && userData.surname) return;
+
+                    // Obtener datos adicionales de la API
+                    fetch('/api/user/profile', {
+                        method: 'GET',
+                        headers: {
+                            'Authorization': 'Bearer ' + token,
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.ok ? response.json() : Promise.reject('Network error'))
+                    .then(data => {
+                        if (data.status === 'success' && data.data) {
+                            if (!userData.name) document.getElementById('name').value = data.data.name || '';
+                            if (!userData.surname) document.getElementById('surname').value = data.data.surname || '';
+
+                            // Actualizar localStorage
+                            localStorage.setItem('user', JSON.stringify({
+                                id: userData.id,
+                                username: userData.username,
+                                email: userData.email,
+                                name: data.data.name || userData.name || '',
+                                surname: data.data.surname || userData.surname || ''
+                            }));
+                        } else {
+                            showAlert('error', data.message || 'Error loading profile data');
+                        }
+                    })
+                    .catch(error => showAlert('error', 'Error loading profile data. Please try again later.'));
                 } catch (error) {
-                    console.error('Error procesando datos de usuario:', error);
-                    showAlert('error', 'Error procesando datos de usuario: ' + error.message);
+                    showAlert('error', 'Error processing user data: ' + error.message);
                 }
             }
 
-            // Función para actualizar perfil de usuario
+            // Actualizar perfil
             function updateProfile() {
                 const token = localStorage.getItem('token');
-
                 if (!token) {
                     window.location.href = '/login';
                     return;
@@ -340,40 +274,34 @@
 
                 // Validar datos
                 if (!name || !surname) {
-                    showAlert('error', 'Nombre y apellido son obligatorios');
+                    showAlert('error', 'Name and surname are required');
                     return;
                 }
 
-                // Comprobar campos de contraseña
+                // Verificar campos de contraseña
                 if (newPassword || confirmPassword) {
                     if (!currentPassword) {
-                        showAlert('error', 'Se requiere contraseña actual para cambiar contraseña');
+                        showAlert('error', 'Current password required to change password');
                         return;
                     }
-
                     if (newPassword !== confirmPassword) {
-                        showAlert('error', 'La nueva contraseña y su confirmación no coinciden');
+                        showAlert('error', 'New password and confirmation do not match');
                         return;
                     }
                 }
 
-                // Preparar datos para API
-                const userData = {
-                    name: name,
-                    surname: surname
-                };
-
-                // Añadir datos de contraseña si se proporcionaron
+                // Preparar datos para la API
+                const userData = { name, surname };
                 if (currentPassword && newPassword) {
                     userData.currentPassword = currentPassword;
                     userData.newPassword = newPassword;
                 }
 
-                // Deshabilitar botón guardar y mostrar estado de carga
+                // Deshabilitar botón de guardar y mostrar estado de carga
                 saveProfileBtn.disabled = true;
-                saveProfileBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Guardando...';
+                saveProfileBtn.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>Saving...';
 
-                // Enviar solicitud de actualización a API
+                // Enviar solicitud de actualización
                 fetch('/api/user/update', {
                     method: 'POST',
                     headers: {
@@ -382,86 +310,48 @@
                     },
                     body: JSON.stringify(userData)
                 })
-                .then(function(response) {
-                    if (!response.ok) {
-                        throw new Error('Error en respuesta de red');
-                    }
-                    return response.json();
-                })
-                .then(function(data) {
+                .then(response => response.ok ? response.json() : Promise.reject('Network error'))
+                .then(data => {
                     if (data.status === 'success') {
-                        showAlert('success', data.message || 'Perfil actualizado exitosamente');
-
+                        showAlert('success', data.message || 'Profile updated successfully');
                         // Limpiar campos de contraseña
                         document.getElementById('currentPassword').value = '';
                         document.getElementById('newPassword').value = '';
                         document.getElementById('confirmPassword').value = '';
 
-                        // Actualizar localStorage si se devolvieron datos de usuario
-                        if (data.user) {
-                            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-                            const updatedUser = {
-                                id: storedUser.id,
-                                username: storedUser.username,
-                                email: storedUser.email,
-                                name: document.getElementById('name').value,
-                                surname: document.getElementById('surname').value
-                            };
-                            localStorage.setItem('user', JSON.stringify(updatedUser));
-                        } else {
-                            // Si no se devolvieron datos, actualizar localStorage con valores del formulario
-                            const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
-                            if (storedUser) {
-                                const updatedUser = {
-                                    id: storedUser.id,
-                                    username: storedUser.username,
-                                    email: storedUser.email,
-                                    name: document.getElementById('name').value,
-                                    surname: document.getElementById('surname').value
-                                };
-                                localStorage.setItem('user', JSON.stringify(updatedUser));
-                            }
-                        }
+                        // Actualizar localStorage
+                        const storedUser = JSON.parse(localStorage.getItem('user') || '{}');
+                        localStorage.setItem('user', JSON.stringify({
+                            ...storedUser,
+                            name: document.getElementById('name').value,
+                            surname: document.getElementById('surname').value
+                        }));
                     } else {
-                        showAlert('error', data.message || 'Error actualizando perfil');
+                        showAlert('error', data.message || 'Error updating profile');
                     }
                 })
-                .catch(function(error) {
-                    console.error('Error actualizando perfil:', error);
-                    showAlert('error', 'Error actualizando perfil. Por favor intente más tarde.');
-                })
-                .finally(function() {
-                    // Re-habilitar botón guardar
+                .catch(error => showAlert('error', 'Error updating profile. Please try again later.'))
+                .finally(() => {
                     saveProfileBtn.disabled = false;
-                    saveProfileBtn.innerHTML = '<i class="bi bi-save me-2"></i>' + ('{{ translations.save_changes }}' || 'Guardar Cambios');
+                    saveProfileBtn.innerHTML = '<i class="bi bi-save me-2"></i>{{ translations.save_changes }}';
                 });
             }
 
-            // Función para cerrar sesión
+            // Función de cierre de sesión
             function logout() {
-                console.log('Cerrando sesión...');
-                // Limpiar localStorage
                 localStorage.removeItem('token');
                 localStorage.removeItem('user');
                 sessionStorage.clear();
-
-                // Redireccionar a página de login
                 window.location.href = '/login';
             }
 
-            // Función para mostrar alerta
+            // Mostrar alerta
             function showAlert(type, message) {
                 profileAlert.classList.remove('d-none', 'alert-success', 'alert-danger');
                 profileAlert.classList.add(type === 'success' ? 'alert-success' : 'alert-danger');
                 profileAlert.textContent = message;
-
-                // Desplazarse a alerta
                 profileAlert.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-                // Auto ocultar alerta después de 5 segundos
-                setTimeout(function() {
-                    profileAlert.classList.add('d-none');
-                }, 5000);
+                setTimeout(() => profileAlert.classList.add('d-none'), 5000);
             }
         });
     </script>

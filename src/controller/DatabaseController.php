@@ -1,13 +1,5 @@
 <?php
 
-/**
- * Controlador de Base de Datos
- * 
- * Este controlador maneja la conexión a la base de datos utilizando el patrón Singleton.
- * Proporciona métodos para conectarse a la base de datos MySQL y gestiona las credenciales
- * de conexión de manera centralizada.
- */
-
 class DatabaseController
 {
     /**
@@ -48,15 +40,6 @@ class DatabaseController
      * @var DatabaseController
      */
     private static $instance = null;
-
-    /**
-     * Constructor privado para evitar la creación de instancias desde fuera de la clase
-     * Implementa el patrón Singleton
-     */
-    private function __construct()
-    {
-        // El proceso costoso (por ejemplo, la conexión a la base de datos) va aquí.
-    }
 
     /**
      * Obtiene la instancia única de la clase (patrón Singleton)

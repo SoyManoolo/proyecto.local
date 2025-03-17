@@ -69,3 +69,42 @@
         </div>
     </div>
 {% endblock %}
+
+{% block scripts %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.querySelector('form');
+        // Envía el formulario
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(form);
+
+            try {
+                // Realiza la petición al servidor
+                const response = await fetch('/api/user/register', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (data.status === 'success') {
+                    // Almacena los datos del usuario en localStorage
+                    localStorage.setItem('token', data.token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    // Redirecciona a la página principal
+                    window.location.href = '/home';
+                } else {
+                    // Muestra error
+                    alert(data.message || 'Error al registrarse');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Error al conectar con el servidor');
+            }
+        });
+    });
+    </script>
+{% endblock %}
