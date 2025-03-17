@@ -19,6 +19,11 @@
 composer install
 mysql -u root -p < src/db/BlueLock.sql
 ```
+## Ejecución del scraper
+Antes de iniciar el proyecto debes ejecutar el archivo para scrapear los datos
+```bash
+python3 ./src/scraper/scraper.py
+```
 
 ## Funcionalidades Clave
 ### Autenticación JWT

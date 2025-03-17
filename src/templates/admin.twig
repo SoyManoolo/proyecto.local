@@ -654,10 +654,10 @@
                 showToast('Error', 'Please fill all required fields', 'error');
                 return;
             }
-            
+
             const url = isNewPlayer ? '/api/admin/players' : `/api/admin/players/${playerId}`;
             const method = isNewPlayer ? 'POST' : 'PUT';
-            
+
             fetch(url, {
                 method: method,
                 headers: {
@@ -681,29 +681,29 @@
                 showToast('Error', 'Failed to connect to the server', 'error');
             });
         }
-        
+
         function confirmDeletePlayer(playerId) {
             const player = playersData.find(p => p.player_id == playerId);
-            
+
             if (!player) {
                 showToast('Error', 'Player not found', 'error');
                 return;
             }
-            
+
             document.getElementById('deletePlayerName').textContent = `${player.name} ${player.surname}`;
             document.getElementById('deletePlayerId').value = player.player_id;
-            
+
             deleteModal.show();
         }
-        
+
         function deletePlayer() {
             const playerId = document.getElementById('deletePlayerId').value;
-            
+
             if (!playerId) {
                 showToast('Error', 'Player ID not found', 'error');
                 return;
             }
-            
+
             fetch(`/api/admin/players/${playerId}`, {
                 method: 'DELETE',
                 headers: { 'Authorization': `Bearer ${token}` }
@@ -723,22 +723,22 @@
                 showToast('Error', 'Failed to connect to the server', 'error');
             });
         }
-        
+
         function showToast(title, message, type = 'info') {
             const toastEl = document.getElementById('alertToast');
             const titleEl = document.getElementById('toastTitle');
             const messageEl = document.getElementById('toastMessage');
-            
+
             titleEl.textContent = title;
             messageEl.textContent = message;
-            
+
             toastEl.className = 'toast';
             toastEl.classList.add(
                 type === 'error' ? 'bg-danger' : 
                 type === 'success' ? 'bg-success' : 'bg-info', 
                 'text-white'
             );
-            
+
             alertToast.show();
         }
     });
