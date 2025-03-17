@@ -1,6 +1,6 @@
 <?php
 //Controlador para manejar las solicitudes relacionadas con los usuarios
-require_once __DIR__ . "../DatabaseController.php";
+require_once __DIR__ . "/DatabaseController.php";
 
 // Importar la clase JWT de Firebase
 use Firebase\JWT\JWT;
